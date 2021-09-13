@@ -50,6 +50,7 @@ class ImageDataset(data.Dataset):
             img = self.transform(img)
         if target is None:
             target = torch.tensor(-1, dtype=torch.long)
+        #print(img.shape)
         return img, target
 
     def __len__(self):

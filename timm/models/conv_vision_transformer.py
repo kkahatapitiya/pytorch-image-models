@@ -27,8 +27,6 @@ import logging
 from functools import partial
 from collections import OrderedDict
 from copy import deepcopy
-from einops import rearrange
-import numpy as np
 
 import torch
 import torch.nn as nn
@@ -178,7 +176,7 @@ default_cfgs = {
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0., depth=0):
+    def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0.):
         super().__init__()
         self.num_heads = num_heads
         head_dim = dim // num_heads
@@ -189,95 +187,9 @@ class Attention(nn.Module):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
-        #self.dense_mix = nn.Linear(min(depth+1,3) * dim, dim, bias=qkv_bias) if depth>0 else None
-        self.dense_mul = min(depth+1,3)
-        #self.dense_prob = [[1.], [0.6, 0.4], [0.5, 0.3, 0.2]][self.dense_mul-1]
-        #self.dense_test_ind=[[0]*10, [0,1,0,1,0]*2, [0,0,1,0,2,1,0,0,1,2]][self.dense_mul-1]
-        '''MAX_DEPTH = 12-1
-        p_self = 0.5 + 0.4 * abs(2*depth/MAX_DEPTH - 1)
-        self.dense_prob = [[1.], [p_self, 1-p_self], [p_self, (1-p_self)*0.75, (1-p_self)*0.25]][self.dense_mul-1]'''
-
-        self.dense_mix_q = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None
-        self.dense_mix_k = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None
-        self.dense_mix_v = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None
-
-
-    def forward(self, x, prev_q, prev_k, prev_v):
-        B, N, C = x.shape
-        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
-
-        q0, k0, v0 = q, k, v
-        '''
-        if prev_k is not None:
-            #k, v = torch.cat([k, prev_k], dim=2), torch.cat([v, prev_v], dim=2) # B h N 3C//h
-            k, v = torch.cat([k, prev_k], dim=-1), torch.cat([v, prev_v], dim=-1)
-            k, v = rearrange(k, 'b h n c -> b n (h c)'), rearrange(v, 'b h n c -> b n (h c)')
-            #print(k.shape, self.dense_mix.weight.shape)
-            k, v = self.dense_mix(k), self.dense_mix(v)
-            k = rearrange(k, 'b n (h c) -> b h n c', h=self.num_heads, c=C // self.num_heads)
-            v = rearrange(v, 'b n (h c) -> b h n c', h=self.num_heads, c=C // self.num_heads)
-
-        if prev_k is not None:
-            k, v = torch.cat([k, prev_k], dim=-2), torch.cat([v, prev_v], dim=-2) # B h 3N C//h
-
-            #if self.training:
-            k, v = rearrange(k, 'b h n c -> (b n) h c'), rearrange(v, 'b h n c -> (b n) h c')
-            #print(k.shape, v.shape)
-
-            r_ind = torch.arange(N).view(1,-1).repeat(B, 1)
-            #if self.training:
-            r_ind += N * torch.from_numpy(np.random.choice([ii for ii in range(self.dense_mul)], size=(B, N), p=self.dense_prob))
-            #else:
-            #    r_ind += (torch.from_numpy(np.array(self.dense_test_ind)) * N).view(1,-1).repeat(B,1+N//len(self.dense_test_ind))[:,:N]
-            r_ind += torch.arange(B).view(-1,1) * N * self.dense_mul
-            k, v = k[r_ind.view(-1),...], v[r_ind.view(-1),...]
-            #print(k.shape, v.shape)
-
-            k = rearrange(k, '(b n) h c -> b h n c', b=B, n=N)
-            v = rearrange(v, '(b n) h c -> b h n c', b=B, n=N)
-            #print(k.shape, v.shape)
-        '''
-        if prev_k is not None:
-            q, k, v = torch.cat([q.unsqueeze(-1), prev_q], dim=-1), torch.cat([k.unsqueeze(-1), prev_k], dim=-1), torch.cat([v.unsqueeze(-1), prev_v], dim=-1) # B h N C//h 3
-            q = torch.sum(self.dense_mix_q.view(1,1,N,1,-1).softmax(dim=-1) * q, dim=-1)
-            k = torch.sum(self.dense_mix_k.view(1,1,N,1,-1).softmax(dim=-1) * k, dim=-1)
-            v = torch.sum(self.dense_mix_v.view(1,1,N,1,-1).softmax(dim=-1) * v, dim=-1)
-
-
-
-        attn = (q @ k.transpose(-2, -1)) * self.scale
-        attn = attn.softmax(dim=-1)
-        attn = self.attn_drop(attn)
-
-        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
-        x = self.proj(x)
-        x = self.proj_drop(x)
-        return x, q0, k0, v0
-
-'''
-class Attention2(nn.Module):
-    def __init__(self, seq_len, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0.):
-        super().__init__()
-        self.num_heads = num_heads
-        head_dim = (seq_len - 1) // num_heads
-        self.scale = head_dim ** -0.5
-
-        self.qkv = nn.Linear(seq_len, seq_len * 3, bias=qkv_bias)
-        self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = nn.Linear(dim, dim)
-        self.cls_proj = nn.Linear(dim, dim)
-        self.act = nn.GELU()
-        self.proj_drop = nn.Dropout(proj_drop)
-
     def forward(self, x):
-        #B, N, C = x.shape
-        #x = torch.cat([x, torch. (B,N,1).cuda()],dim=-1)
-        cls, x = x[:,:1,:], x[:,1:,:] # B 1 C, B N-1 C
-        x = x.transpose(1,2).contiguous() # B C N-1
         B, N, C = x.shape
         #print(x.shape)
-
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
 
@@ -286,49 +198,31 @@ class Attention2(nn.Module):
         attn = self.attn_drop(attn)
 
         x = (attn @ v).transpose(1, 2).reshape(B, N, C)
-        cls = self.attn_drop(self.act(self.cls_proj(cls)))
-        x = torch.cat([cls, x.transpose(1,2).contiguous()], dim=1)
         x = self.proj(x)
         x = self.proj_drop(x)
-        #x = x[...,:-1]
         return x
-'''
+
+
 
 class Block(nn.Module):
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, depth=0):
+                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm):
         super().__init__()
         self.norm1 = norm_layer(dim)
-        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
-        #self.mlp_tokens = Mlp(197, dim//2, act_layer=act_layer, drop=drop)
+        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
-        #self.attn2 = Attention2(seq_len=196, dim=dim, num_heads=4, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
-        self.depth = depth
 
 
-    def forward(self, x, prev_q, prev_k, prev_v):
-        #x = x + self.drop_path(self.attn(self.norm1(x)))
-        x_, prev_q, prev_k, prev_v = self.attn(self.norm1(x), prev_q, prev_k, prev_v)
-        #x__ = self.mlp_tokens(self.norm1(x).transpose(1, 2)).transpose(1, 2)
-        #x = x + self.drop_path((x_ + x__)/2.)
-        x = x + self.drop_path(x_)
+    def forward(self, x):
+        x = x + self.drop_path(self.attn(self.norm1(x)))
         x = x + self.drop_path(self.mlp(self.norm2(x)))
 
-        #x = x + self.drop_path(self.attn2(self.norm2(x).transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous())
-
-        #x_skip = x
-        #x = self.norm2(x)
-        #x =torch.cat([self.mlp(x[:,0:1,:]), self.attn2(x[:,1:,:].transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous()], dim=1)
-        #x = x_skip + self.drop_path(x)
-
-        #x = x + self.drop_path(self.attn2(self.norm2(x)))
-
-        return x, prev_q, prev_k, prev_v
+        return x
 
 
 class VisionTransformer(nn.Module):
@@ -385,7 +279,7 @@ class VisionTransformer(nn.Module):
         self.blocks = nn.Sequential(*[
             Block(
                 dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, drop=drop_rate,
-                attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, act_layer=act_layer, depth=i)
+                attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, act_layer=act_layer)
             for i in range(depth)])
         self.norm = norm_layer(embed_dim)
 
@@ -452,30 +346,7 @@ class VisionTransformer(nn.Module):
         else:
             x = torch.cat((cls_token, self.dist_token.expand(x.shape[0], -1, -1), x), dim=1)
         x = self.pos_drop(x + self.pos_embed)
-        #x = self.blocks(x)
-
-        '''######################################################################################'''
-        prev_q, prev_k, prev_v = None, None, None # B h N C//h
-        for blk in self.blocks:
-            x, new_q, new_k, new_v = blk(x, prev_q, prev_k, prev_v)
-            if prev_k is None:
-                #prev_k, prev_v = new_k, new_v
-                prev_q, prev_k, prev_v = new_q.unsqueeze(-1), new_k.unsqueeze(-1), new_v.unsqueeze(-1)
-            else:
-                #ch = new_k.shape[-1]
-                #prev_k = torch.cat([new_k, prev_k], dim=-1)[...,:ch * min(blk.depth+1, 3-1)]
-                #prev_v = torch.cat([new_v, prev_v], dim=-1)[...,:ch * min(blk.depth+1, 3-1)]
-
-                #nt = new_k.shape[-2]
-                #prev_k = torch.cat([new_k, prev_k], dim=-2)[:,:,:nt * min(blk.depth+1, 3-1),:]
-                #prev_v = torch.cat([new_v, prev_v], dim=-2)[:,:,:nt * min(blk.depth+1, 3-1),:]
-
-                prev_q = torch.cat([new_q.unsqueeze(-1), prev_q], dim=-1)[..., :min(blk.depth+1, 3-1)]
-                prev_k = torch.cat([new_k.unsqueeze(-1), prev_k], dim=-1)[..., :min(blk.depth+1, 3-1)]
-                prev_v = torch.cat([new_v.unsqueeze(-1), prev_v], dim=-1)[..., :min(blk.depth+1, 3-1)]
-
-            #x, _, _ = blk(x, prev_k, prev_v)
-
+        x = self.blocks(x)
         x = self.norm(x)
         if self.dist_token is None:
             return self.pre_logits(x[:, 0])

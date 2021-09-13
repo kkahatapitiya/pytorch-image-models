@@ -444,7 +444,7 @@ def build_model_with_cfg(
     # Build the model
     model = model_cls(**kwargs) if model_cfg is None else model_cls(cfg=model_cfg, **kwargs)
     model.default_cfg = default_cfg
-    
+
     if pruned:
         model = adapt_model_from_file(model, variant)
 
@@ -474,7 +474,7 @@ def build_model_with_cfg(
                     assert False, f'Unknown feature class {feature_cls}'
         model = feature_cls(model, **feature_cfg)
         model.default_cfg = default_cfg_for_features(default_cfg)  # add back default_cfg
-    
+
     return model
 
 

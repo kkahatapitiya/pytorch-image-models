@@ -14,10 +14,21 @@ NVIDIA CUDA specific speedups adopted from NVIDIA Apex examples
 
 Hacked together by / Copyright 2020 Ross Wightman (https://github.com/rwightman)
 """
+
+'''
+CUDA_VISIBLE_DEVICES=5 python train.py /nfs/bigneuron.cs.stonybrook.edu/add_disk0/kumarak/imagenet1K --config config/vit_b16_i1k_scratch.yaml
+CUDA_VISIBLE_DEVICES=4,5 ./distributed_train.sh 2 /nfs/bigneuron.cs.stonybrook.edu/add_disk0/kumarak/imagenet1K --config config/vit_b16_i1k_scratch.yaml
+
+CUDA_VISIBLE_DEVICES=7 python validate.py /data/add_disk0/kumarak/imagenet1K/validation/ --model mixer_b16_224 --pretrained
+
+vit_base_patch16_224 bs-128, small bs-256 tiny-512
+'''
+
 import argparse
 import time
 import yaml
 import os
+#import gc
 import logging
 from collections import OrderedDict
 from contextlib import suppress
@@ -55,7 +66,7 @@ except AttributeError:
 try:
     import wandb
     has_wandb = True
-except ImportError: 
+except ImportError:
     has_wandb = False
 
 torch.backends.cudnn.benchmark = True
@@ -301,14 +312,14 @@ def _parse_args():
 def main():
     setup_default_logging()
     args, args_text = _parse_args()
-    
+
     if args.log_wandb:
         if has_wandb:
             wandb.init(project=args.experiment, config=args)
-        else: 
+        else:
             _logger.warning("You've requested to log metrics to wandb but package not found. "
                             "Metrics not being logged to wandb, try `pip install wandb`")
-             
+
     args.prefetcher = not args.no_prefetcher
     args.distributed = False
     if 'WORLD_SIZE' in os.environ:
@@ -588,6 +599,9 @@ def main():
                 lr_scheduler=lr_scheduler, saver=saver, output_dir=output_dir,
                 amp_autocast=amp_autocast, loss_scaler=loss_scaler, model_ema=model_ema, mixup_fn=mixup_fn)
 
+            #gc.collect()
+            #torch.cuda.empty_cache()
+
             if args.distributed and args.dist_bn in ('broadcast', 'reduce'):
                 if args.local_rank == 0:
                     _logger.info("Distributing BatchNorm running means and vars")
@@ -595,12 +609,16 @@ def main():
 
             eval_metrics = validate(model, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast)
 
+            #gc.collect()
+            #torch.cuda.empty_cache()
+
             if model_ema is not None and not args.model_ema_force_cpu:
                 if args.distributed and args.dist_bn in ('broadcast', 'reduce'):
                     distribute_bn(model_ema, args.world_size, args.dist_bn == 'reduce')
                 ema_eval_metrics = validate(
                     model_ema.module, loader_eval, validate_loss_fn, args, amp_autocast=amp_autocast, log_suffix=' (EMA)')
                 eval_metrics = ema_eval_metrics
+                #train_metrics=eval_metrics
 
             if lr_scheduler is not None:
                 # step LR for next epoch
@@ -639,12 +657,14 @@ def train_one_epoch(
     losses_m = AverageMeter()
 
     model.train()
+    #torch.autograd.set_grad_enabled(True)
 
     end = time.time()
     last_idx = len(loader) - 1
     num_updates = epoch * len(loader)
     for batch_idx, (input, target) in enumerate(loader):
         last_batch = batch_idx == last_idx
+        #if batch_idx==51:break
         data_time_m.update(time.time() - end)
         if not args.prefetcher:
             input, target = input.cuda(), target.cuda()
@@ -737,6 +757,7 @@ def validate(model, loader, loss_fn, args, amp_autocast=suppress, log_suffix='')
     top5_m = AverageMeter()
 
     model.eval()
+    #torch.autograd.set_grad_enabled(False)
 
     end = time.time()
     last_idx = len(loader) - 1

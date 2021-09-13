@@ -41,13 +41,14 @@ Hacked together by / Copyright 2021 Ross Wightman
 import math
 from copy import deepcopy
 from functools import partial
+from einops import rearrange
 
 import torch
 import torch.nn as nn
 
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from .helpers import build_model_with_cfg, overlay_external_default_cfg, named_apply
-from .layers import PatchEmbed, Mlp, GluMlp, GatedMlp, DropPath, lecun_normal_, to_2tuple
+from .layers import PatchEmbed, Mlp, GluMlp, GatedMlp, ConvMlpGeneral, ConvMlpGeneralv2, DropPath, lecun_normal_, to_2tuple
 from .registry import register_model
 
 
@@ -63,6 +64,7 @@ def _cfg(url='', **kwargs):
 
 
 default_cfgs = dict(
+    mixer_ti16_224=_cfg(),
     mixer_s32_224=_cfg(),
     mixer_s16_224=_cfg(),
     mixer_b32_224=_cfg(),
@@ -135,6 +137,32 @@ default_cfgs = dict(
     gmlp_b16_224=_cfg(),
 )
 
+class Attention(nn.Module):
+    def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0.):
+        super().__init__()
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+    def forward(self, x):
+        B, N, C = x.shape
+        #print(x.shape)
+        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        x = self.proj_drop(x)
+        return x
 
 class MixerBlock(nn.Module):
     """ Residual Block w/ token mixing and channel MLPs
@@ -150,10 +178,49 @@ class MixerBlock(nn.Module):
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         self.mlp_channels = mlp_layer(dim, channels_dim, act_layer=act_layer, drop=drop)
+        #self.attn = Attention(dim=196, num_heads=4, qkv_bias=True, attn_drop=0., proj_drop=drop)
 
     def forward(self, x):
         x = x + self.drop_path(self.mlp_tokens(self.norm1(x).transpose(1, 2)).transpose(1, 2))
         x = x + self.drop_path(self.mlp_channels(self.norm2(x)))
+
+        #x = x + self.drop_path(self.attn(self.norm2(x).transpose(-1,-2)).transpose(-1,-2))
+        return x
+
+
+class MixerBlockConv(nn.Module):
+    """ Residual Block w/ token mixing and channel MLPs
+    Based on: 'MLP-Mixer: An all-MLP Architecture for Vision' - https://arxiv.org/abs/2105.01601
+    """
+    def __init__(
+            self, dim, seq_len, mlp_ratio=(0.5, 4.0), mlp_layer=Mlp,
+            norm_layer=partial(nn.LayerNorm, eps=1e-6), act_layer=nn.GELU, drop=0., drop_path=0.):
+        super().__init__()
+        tokens_dim, channels_dim = [int(x * dim) for x in to_2tuple(mlp_ratio)]
+        self.norm1 = norm_layer(dim)
+        # ConvMlpGeneral, ConvMlpGeneralv2
+        self.mlp_tokens = ConvMlpGeneral(seq_len, tokens_dim, act_layer=act_layer, drop=drop, spatial_dim='1d',
+                                        kernel_size=3, groups=4)
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+        self.norm2 = norm_layer(dim)
+        self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
+                                        kernel_size=3, groups=8) # ConvMlpGeneral
+        #self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
+        self.H = self.W = 14
+        #self.attn = Attention(dim=196, num_heads=4, qkv_bias=True, attn_drop=0., proj_drop=drop)
+
+    def forward(self, x):
+        # B N C
+        x = x + self.drop_path(self.mlp_tokens(self.norm1(x)))
+        #x = x + self.drop_path(self.mlp_channels(self.norm2(x)))
+
+        res = x
+        x = self.norm2(x) # B N C
+        x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
+        x = self.mlp_channels(x)
+        x = rearrange(x, 'b c h w -> b (h w) c')
+        x = res + self.drop_path(x)
+
         return x
 
 
@@ -244,8 +311,8 @@ class MlpMixer(nn.Module):
             patch_size=16,
             num_blocks=8,
             embed_dim=512,
-            mlp_ratio=(0.5, 4.0),
-            block_layer=MixerBlock,
+            mlp_ratio=(0.5, 4.0), #(0.5, 4.0),
+            block_layer=MixerBlockConv, #MixerBlockConv, #MixerBlock,
             mlp_layer=Mlp,
             norm_layer=partial(nn.LayerNorm, eps=1e-6),
             act_layer=nn.GELU,
@@ -356,6 +423,16 @@ def _create_mixer(variant, pretrained=False, **kwargs):
         default_cfg=default_cfgs[variant],
         pretrained_filter_fn=checkpoint_filter_fn,
         **kwargs)
+    return model
+
+
+@register_model
+def mixer_ti16_224(pretrained=False, **kwargs):
+    """ Mixer-Ti/16 224x224
+    Paper:  'MLP-Mixer: An all-MLP Architecture for Vision' - https://arxiv.org/abs/2105.01601
+    """
+    model_args = dict(patch_size=16, num_blocks=8, embed_dim=256, **kwargs)
+    model = _create_mixer('mixer_ti16_224', pretrained=pretrained, **model_args)
     return model
 
 
