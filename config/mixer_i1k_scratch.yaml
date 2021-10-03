@@ -4,9 +4,9 @@ dataset: ImageFolder
 train_split: train
 val_split: validation
 model: mixer_ti16_224 #vit_small_patch16_224 #vit_base_patch16_224
-pretrained: false
+pretrained: false #true #false
 initial_checkpoint: ''
-resume: ''
+resume: '' #'output/train/20210928-163750-mixer_ti16_224-224/model_best.pth.tar' #''
 no_resume_opt: false
 num_classes: 1000
 gp: null
@@ -22,8 +22,8 @@ std:
 - 0.224
 - 0.225 #null ###
 interpolation: ''
-batch_size: 1024 #682 #512 #4096 #224 ###
-validation_batch_size_multiplier: 2 #3 #4
+batch_size: 512 #768 #1024 #768 #1024 #682 #512 #4096 #224 ###
+validation_batch_size_multiplier: 4 #3 #2 #3 #4
 
 # Optimizer parameters
 opt: adamw
@@ -36,7 +36,7 @@ clip_mode: norm
 
 # Learning rate schedule parameters
 sched: cosine
-lr: 1.5e-3 #3.0e-3 #0.0008 ###
+lr: 0.75e-3 #1.125e-3 #1.5e-3 #1.125e-3 #1.5e-3 #3.0e-3 #0.0008 ###
 lr_noise: null
 lr_noise_pct: 0.67
 lr_noise_std: 1.0
@@ -48,7 +48,7 @@ epochs: 300 #600 ###
 epoch_repeats: 0.0
 start_epoch: null
 decay_epochs: 1.0
-warmup_epochs: 15 #30 #20 ### 10k steps?
+warmup_epochs: 8 #12 #15 #12 #15 #30 #20 ### 10k steps?
 cooldown_epochs: 10
 patience_epochs: 10
 decay_rate: 0.988

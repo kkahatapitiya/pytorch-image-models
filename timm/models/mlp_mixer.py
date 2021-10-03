@@ -196,15 +196,20 @@ class MixerBlockConv(nn.Module):
             self, dim, seq_len, mlp_ratio=(0.5, 4.0), mlp_layer=Mlp,
             norm_layer=partial(nn.LayerNorm, eps=1e-6), act_layer=nn.GELU, drop=0., drop_path=0.):
         super().__init__()
+        #norm_layer=nn.BatchNorm1d
+        #norm_layer2=nn.BatchNorm2d
+        #norm_layer2=partial(nn.GroupNorm, eps=1e-6)
         tokens_dim, channels_dim = [int(x * dim) for x in to_2tuple(mlp_ratio)]
         self.norm1 = norm_layer(dim)
+        #self.norm1 = norm_layer(seq_len)
         # ConvMlpGeneral, ConvMlpGeneralv2
         self.mlp_tokens = ConvMlpGeneral(seq_len, tokens_dim, act_layer=act_layer, drop=drop, spatial_dim='1d',
-                                        kernel_size=3, groups=4)
+                                        kernel_size=5, groups=1) # groups=4
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
+        #self.norm2 = norm_layer2(num_groups=4, num_channels=dim)
         self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
-                                        kernel_size=3, groups=8) # ConvMlpGeneral
+                                        kernel_size=5, groups=1) #groups=4 groups=8 # ConvMlpGeneral
         #self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
         self.H = self.W = 14
         #self.attn = Attention(dim=196, num_heads=4, qkv_bias=True, attn_drop=0., proj_drop=drop)
@@ -215,7 +220,9 @@ class MixerBlockConv(nn.Module):
         #x = x + self.drop_path(self.mlp_channels(self.norm2(x)))
 
         res = x
+        #x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
         x = self.norm2(x) # B N C
+        #x = self.norm2(x.transpose(-1,-2)).transpose(-1,-2) # B N C
         x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
         x = self.mlp_channels(x)
         x = rearrange(x, 'b c h w -> b (h w) c')

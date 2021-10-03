@@ -36,7 +36,7 @@ import torch.nn.functional as F
 
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD, IMAGENET_INCEPTION_MEAN, IMAGENET_INCEPTION_STD
 from .helpers import build_model_with_cfg, named_apply, adapt_input_conv
-from .layers import PatchEmbed, Mlp, DropPath, trunc_normal_, lecun_normal_
+from .layers import PatchEmbed, Mlp, ConvMlpGeneral, DropPath, trunc_normal_, lecun_normal_
 from .registry import register_model
 
 _logger = logging.getLogger(__name__)
@@ -176,6 +176,7 @@ default_cfgs = {
     ),
 }
 
+########################################################################################################################
 
 class Attention(nn.Module):
     def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0., depth=0):
@@ -190,24 +191,25 @@ class Attention(nn.Module):
         self.proj_drop = nn.Dropout(proj_drop)
 
         #self.dense_mix = nn.Linear(min(depth+1,3) * dim, dim, bias=qkv_bias) if depth>0 else None
-        self.dense_mul = min(depth+1,3)
+        '''self.dense_mul = min(depth+1,3)
         #self.dense_prob = [[1.], [0.6, 0.4], [0.5, 0.3, 0.2]][self.dense_mul-1]
         #self.dense_test_ind=[[0]*10, [0,1,0,1,0]*2, [0,0,1,0,2,1,0,0,1,2]][self.dense_mul-1]
-        '''MAX_DEPTH = 12-1
-        p_self = 0.5 + 0.4 * abs(2*depth/MAX_DEPTH - 1)
-        self.dense_prob = [[1.], [p_self, 1-p_self], [p_self, (1-p_self)*0.75, (1-p_self)*0.25]][self.dense_mul-1]'''
+
+        #MAX_DEPTH = 12-1
+        #p_self = 0.5 + 0.4 * abs(2*depth/MAX_DEPTH - 1)
+        #self.dense_prob = [[1.], [p_self, 1-p_self], [p_self, (1-p_self)*0.75, (1-p_self)*0.25]][self.dense_mul-1]
 
         self.dense_mix_q = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None
         self.dense_mix_k = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None
-        self.dense_mix_v = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None
+        self.dense_mix_v = nn.Parameter(torch.FloatTensor(197, min(depth+1,3))) if depth>0 else None'''
 
 
-    def forward(self, x, prev_q, prev_k, prev_v):
+    def forward(self, x):#, prev_q, prev_k, prev_v):
         B, N, C = x.shape
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
 
-        q0, k0, v0 = q, k, v
+        #q0, k0, v0 = q, k, v
         '''
         if prev_k is not None:
             #k, v = torch.cat([k, prev_k], dim=2), torch.cat([v, prev_v], dim=2) # B h N 3C//h
@@ -238,13 +240,12 @@ class Attention(nn.Module):
             v = rearrange(v, '(b n) h c -> b h n c', b=B, n=N)
             #print(k.shape, v.shape)
         '''
-        if prev_k is not None:
+
+        '''if prev_k is not None:
             q, k, v = torch.cat([q.unsqueeze(-1), prev_q], dim=-1), torch.cat([k.unsqueeze(-1), prev_k], dim=-1), torch.cat([v.unsqueeze(-1), prev_v], dim=-1) # B h N C//h 3
             q = torch.sum(self.dense_mix_q.view(1,1,N,1,-1).softmax(dim=-1) * q, dim=-1)
             k = torch.sum(self.dense_mix_k.view(1,1,N,1,-1).softmax(dim=-1) * k, dim=-1)
-            v = torch.sum(self.dense_mix_v.view(1,1,N,1,-1).softmax(dim=-1) * v, dim=-1)
-
-
+            v = torch.sum(self.dense_mix_v.view(1,1,N,1,-1).softmax(dim=-1) * v, dim=-1)'''
 
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
@@ -253,7 +254,57 @@ class Attention(nn.Module):
         x = (attn @ v).transpose(1, 2).reshape(B, N, C)
         x = self.proj(x)
         x = self.proj_drop(x)
-        return x, q0, k0, v0
+        return x#, q0, k0, v0
+
+
+class Block(nn.Module):
+
+    def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, drop=0., attn_drop=0.,
+                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, depth=0):
+        super().__init__()
+        self.norm1 = norm_layer(dim)
+        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
+        #self.mlp_tokens = Mlp(197, dim//2, act_layer=act_layer, drop=drop)
+        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+        self.norm2 = norm_layer(dim)
+        mlp_hidden_dim = int(dim * mlp_ratio)
+        #self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.mlp = ConvMlpGeneral(dim, mlp_hidden_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
+                                    kernel_size=5, groups=1)
+        #self.attn2 = Attention2(seq_len=196, dim=dim, num_heads=4, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
+        self.H = self.W = 14
+        self.depth = depth
+
+
+    def forward(self, x):#, prev_q, prev_k, prev_v):
+        x = x + self.drop_path(self.attn(self.norm1(x))) # B N C
+        #x_, prev_q, prev_k, prev_v = self.attn(self.norm1(x), prev_q, prev_k, prev_v)
+        ##x__ = self.mlp_tokens(self.norm1(x).transpose(1, 2)).transpose(1, 2)
+        ##x = x + self.drop_path((x_ + x__)/2.)
+        #x = x + self.drop_path(x_)
+
+        #x = x + self.drop_path(self.mlp(self.norm2(x)))
+
+        res = x
+        x = self.norm2(x) # B N C
+        x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
+        x = self.mlp(x)
+        x = rearrange(x, 'b c h w -> b (h w) c')
+        x = res + self.drop_path(x)
+
+        #x = x + self.drop_path(self.attn2(self.norm2(x).transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous())
+
+        #x_skip = x
+        #x = self.norm2(x)
+        #x =torch.cat([self.mlp(x[:,0:1,:]), self.attn2(x[:,1:,:].transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous()], dim=1)
+        #x = x_skip + self.drop_path(x)
+
+        #x = x + self.drop_path(self.attn2(self.norm2(x)))
+
+        return x#, prev_q, prev_k, prev_v
+
+########################################################################################################################
 
 '''
 class Attention2(nn.Module):
@@ -294,42 +345,91 @@ class Attention2(nn.Module):
         return x
 '''
 
-class Block(nn.Module):
+########################################################################################################################
+
+class Attention3(nn.Module):
+    def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0., depth=0, dc=1):
+        super().__init__()
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+
+        self.q = nn.Linear(dim, dim * 1, bias=qkv_bias)
+        self.kv = nn.Linear(dim, dim * 2, bias=qkv_bias)
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+        '''DEPTH_CONNECTIONS = dc #3
+        self.dense_mul = min(depth+1,DEPTH_CONNECTIONS)
+
+        self.dense_mix_q = nn.Parameter(torch.FloatTensor(197, self.dense_mul)) if depth>0 else None
+        self.dense_mix_kv = nn.Parameter(torch.FloatTensor(197, self.dense_mul)) if depth>0 else None'''
+
+
+    def forward(self, xq, xkv): #x, prev_x):
+        B, N, C = xq.shape
+
+        '''B, N, C = x.shape
+        x0 = xq = xkv = x
+
+        if prev_x is not None:
+            x = torch.cat([x.unsqueeze(-1), prev_x], dim=-1) # B N C 3
+            xq = torch.sum(self.dense_mix_q.view(1,N,1,-1).softmax(dim=-1) * x, dim=-1)
+            xkv = torch.sum(self.dense_mix_kv.view(1,N,1,-1).softmax(dim=-1) * x, dim=-1)'''
+
+        q = self.q(xq).reshape(B, N, 1, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        kv = self.kv(xkv).reshape(B, N, 2, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        q, k, v = q[0], kv[0], kv[1]
+
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        x = self.proj_drop(x)
+        return x#, x0
+
+
+class Block3(nn.Module):
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, drop=0., attn_drop=0.,
-                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, depth=0):
+                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, depth=0, dc=1):
         super().__init__()
         self.norm1 = norm_layer(dim)
-        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
-        #self.mlp_tokens = Mlp(197, dim//2, act_layer=act_layer, drop=drop)
-        # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
+        self.attn = Attention3(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop,
+                                depth=depth, dc=dc)
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
-        #self.attn2 = Attention2(seq_len=196, dim=dim, num_heads=4, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
         self.depth = depth
 
+        DEPTH_CONNECTIONS = dc #3
+        self.dense_mul = min(depth+1,DEPTH_CONNECTIONS)
+        self.dense_mix_q = nn.Parameter(torch.FloatTensor(197, self.dense_mul)) if depth>0 else None
+        self.dense_mix_kv = nn.Parameter(torch.FloatTensor(197, self.dense_mul)) if depth>0 else None
 
-    def forward(self, x, prev_q, prev_k, prev_v):
-        #x = x + self.drop_path(self.attn(self.norm1(x)))
-        x_, prev_q, prev_k, prev_v = self.attn(self.norm1(x), prev_q, prev_k, prev_v)
-        #x__ = self.mlp_tokens(self.norm1(x).transpose(1, 2)).transpose(1, 2)
-        #x = x + self.drop_path((x_ + x__)/2.)
+
+    def forward(self, x, prev_x):
+
+        x0 = xq = xkv = x
+        B, N, C = x.shape
+        if prev_x is not None:
+            x_ = torch.cat([x.unsqueeze(-1), prev_x], dim=-1) # B N C 3
+            xq = torch.sum(self.dense_mix_q.view(1,N,1,-1).softmax(dim=-1) * x_, dim=-1)
+            xkv = torch.sum(self.dense_mix_kv.view(1,N,1,-1).softmax(dim=-1) * x_, dim=-1)
+        x_ = self.attn(self.norm1(xq), self.norm1(xkv))
+
+        #x_, prev_x = self.attn(self.norm1(x), prev_x)
         x = x + self.drop_path(x_)
         x = x + self.drop_path(self.mlp(self.norm2(x)))
 
-        #x = x + self.drop_path(self.attn2(self.norm2(x).transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous())
+        return x, x0 #, prev_x
 
-        #x_skip = x
-        #x = self.norm2(x)
-        #x =torch.cat([self.mlp(x[:,0:1,:]), self.attn2(x[:,1:,:].transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous()], dim=1)
-        #x = x_skip + self.drop_path(x)
-
-        #x = x + self.drop_path(self.attn2(self.norm2(x)))
-
-        return x, prev_q, prev_k, prev_v
-
+########################################################################################################################
 
 class VisionTransformer(nn.Module):
     """ Vision Transformer
@@ -341,7 +441,7 @@ class VisionTransformer(nn.Module):
         - https://arxiv.org/abs/2012.12877
     """
 
-    def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dim=768, depth=12,
+    def __init__(self, img_size=224, patch_size=16, in_chans=3, num_classes=1000, embed_dim=768, embed_dim_map=768, depth=12,
                  num_heads=12, mlp_ratio=4., qkv_bias=True, representation_size=None, distilled=False,
                  drop_rate=0., attn_drop_rate=0., drop_path_rate=0., embed_layer=PatchEmbed, norm_layer=None,
                  act_layer=None, weight_init=''):
@@ -366,9 +466,11 @@ class VisionTransformer(nn.Module):
             weight_init: (str): weight init scheme
         """
         super().__init__()
+        #self.DEPTH_CONNECTIONS = 8 #3
+
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim  # num_features for consistency with other models
-        self.num_tokens = 2 if distilled else 1
+        self.num_tokens = 0 #2 if distilled else 1
         norm_layer = norm_layer or partial(nn.LayerNorm, eps=1e-6)
         act_layer = act_layer or nn.GELU
 
@@ -376,8 +478,8 @@ class VisionTransformer(nn.Module):
             img_size=img_size, patch_size=patch_size, in_chans=in_chans, embed_dim=embed_dim)
         num_patches = self.patch_embed.num_patches
 
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
-        self.dist_token = nn.Parameter(torch.zeros(1, 1, embed_dim)) if distilled else None
+        self.cls_token = None #nn.Parameter(torch.zeros(1, 1, embed_dim))
+        self.dist_token = None #nn.Parameter(torch.zeros(1, 1, embed_dim)) if distilled else None
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + self.num_tokens, embed_dim))
         self.pos_drop = nn.Dropout(p=drop_rate)
 
@@ -387,6 +489,18 @@ class VisionTransformer(nn.Module):
                 dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, drop=drop_rate,
                 attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, act_layer=act_layer, depth=i)
             for i in range(depth)])
+        '''self.blocks = nn.Sequential(*[
+            Block3(
+                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, drop=drop_rate,
+                attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, act_layer=act_layer,
+                depth=i, dc=self.DEPTH_CONNECTIONS)
+            for i in range(depth)])'''
+        '''self.blocks = nn.Sequential(*[
+            Block4(
+                dim=embed_dim, num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, drop=drop_rate,
+                attn_drop=attn_drop_rate, drop_path=dpr[i], norm_layer=norm_layer, act_layer=act_layer,
+                depth=i, dim_map=embed_dim_map)
+            for i in range(depth)])'''
         self.norm = norm_layer(embed_dim)
 
         # Representation layer
@@ -417,7 +531,7 @@ class VisionTransformer(nn.Module):
             # leave cls token as zeros to match jax impl
             named_apply(partial(_init_vit_weights, head_bias=head_bias, jax_impl=True), self)
         else:
-            trunc_normal_(self.cls_token, std=.02)
+            #trunc_normal_(self.cls_token, std=.02)
             self.apply(_init_vit_weights)
 
     def _init_weights(self, m):
@@ -446,16 +560,18 @@ class VisionTransformer(nn.Module):
 
     def forward_features(self, x):
         x = self.patch_embed(x)
-        cls_token = self.cls_token.expand(x.shape[0], -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
+        '''cls_token = self.cls_token.expand(x.shape[0], -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
         if self.dist_token is None:
             x = torch.cat((cls_token, x), dim=1)
         else:
-            x = torch.cat((cls_token, self.dist_token.expand(x.shape[0], -1, -1), x), dim=1)
-        x = self.pos_drop(x + self.pos_embed)
-        #x = self.blocks(x)
+            x = torch.cat((cls_token, self.dist_token.expand(x.shape[0], -1, -1), x), dim=1)'''
 
-        '''######################################################################################'''
-        prev_q, prev_k, prev_v = None, None, None # B h N C//h
+        x = self.pos_drop(x + self.pos_embed)
+
+        x = self.blocks(x)
+
+        ######################################################################################
+        '''prev_q, prev_k, prev_v = None, None, None # B h N C//h
         for blk in self.blocks:
             x, new_q, new_k, new_v = blk(x, prev_q, prev_k, prev_v)
             if prev_k is None:
@@ -474,13 +590,24 @@ class VisionTransformer(nn.Module):
                 prev_k = torch.cat([new_k.unsqueeze(-1), prev_k], dim=-1)[..., :min(blk.depth+1, 3-1)]
                 prev_v = torch.cat([new_v.unsqueeze(-1), prev_v], dim=-1)[..., :min(blk.depth+1, 3-1)]
 
-            #x, _, _ = blk(x, prev_k, prev_v)
+            #x, _, _ = blk(x, prev_k, prev_v)'''
+
+        '''prev_x= None # B N C
+        for blk in self.blocks:
+            DEPTH_CONNECTIONS = min(blk.depth+1, self.DEPTH_CONNECTIONS-1)
+            x, new_x = blk(x, prev_x)
+            if prev_x is None: prev_x = new_x.unsqueeze(-1)
+            else: prev_x = torch.cat([new_x.unsqueeze(-1), prev_x], dim=-1)[..., :DEPTH_CONNECTIONS]'''
+
+        ######################################################################################
 
         x = self.norm(x)
         if self.dist_token is None:
-            return self.pre_logits(x[:, 0])
+            #return self.pre_logits(x[:, 0])
+            return self.pre_logits(x.mean(dim=1))
         else:
             return x[:, 0], x[:, 1]
+
 
     def forward(self, x):
         x = self.forward_features(x)
@@ -494,6 +621,178 @@ class VisionTransformer(nn.Module):
         else:
             x = self.head(x)
         return x
+
+
+
+
+    def forward_start(self, x):
+        x = self.patch_embed(x)
+        cls_token = self.cls_token.expand(x.shape[0], -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
+        if self.dist_token is None:
+            x = torch.cat((cls_token, x), dim=1)
+        else:
+            x = torch.cat((cls_token, self.dist_token.expand(x.shape[0], -1, -1), x), dim=1)
+        x = self.pos_drop(x + self.pos_embed)
+        return x
+
+    def forward_end(self, x):
+        x = self.norm(x)
+        if self.dist_token is None:
+            x = self.pre_logits(x[:, 0])
+        else:
+            x = x[:, 0], x[:, 1]
+
+        if self.head_dist is not None:
+            x, x_dist = self.head(x[0]), self.head_dist(x[1])  # x must be a tuple
+            if self.training and not torch.jit.is_scripting():
+                # during inference, return the average of both classifier predictions
+                return x, x_dist
+            else:
+                return (x + x_dist) / 2
+        else:
+            x = self.head(x)
+        return x
+
+
+########################################################################################################################
+
+
+class Block4(nn.Module):
+
+    def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, drop=0., attn_drop=0.,
+                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, depth=0, dim_map=None):
+        super().__init__()
+        self.norm1 = norm_layer(dim)
+
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(drop)
+
+        if dim_map:
+            self.cls_map_proj = nn.Linear(dim_map, dim)
+
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+        self.norm2 = norm_layer(dim)
+        mlp_hidden_dim = int(dim * mlp_ratio)
+        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.depth = depth
+
+
+    def forward(self, x):
+        x_ = self.norm1(x)
+        B, N, C = x_.shape
+        qkv = self.qkv(x_).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+        x_ = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x_ = self.proj(x_)
+        x_ = self.proj_drop(x_)
+        x = x + self.drop_path(x_)
+
+        x = x + self.drop_path(self.mlp(self.norm2(x)))
+        return x
+
+    def before_qkv(self, x):
+        x_ = self.norm1(x)
+        B, N, C = x_.shape
+        qkv = self.qkv(x_).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+        return q, k, v
+
+    def after_qkv(self, x, q, k, v):
+        B, N, C = x.shape
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+        x_ = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x_ = self.proj(x_)
+        x_ = self.proj_drop(x_)
+        x = x + self.drop_path(x_)
+
+        x = x + self.drop_path(self.mlp(self.norm2(x)))
+        return x
+
+class CrossVisionTransformer(nn.Module):
+
+    def __init__(self, img_size=224, patch_size=(16,32), in_chans=3, num_classes=1000, embed_dim=768, depth=12,
+                 num_heads=12, mlp_ratio=4., qkv_bias=True, representation_size=None, distilled=False,
+                 drop_rate=0., attn_drop_rate=0., drop_path_rate=0., embed_layer=PatchEmbed, norm_layer=None,
+                 act_layer=None, weight_init=''):
+        """
+        Args:
+            img_size (int, tuple): input image size
+            patch_size (int, tuple): patch size
+            in_chans (int): number of input channels
+            num_classes (int): number of classes for classification head
+            embed_dim (int): embedding dimension
+            depth (int): depth of transformer
+            num_heads (int): number of attention heads
+            mlp_ratio (int): ratio of mlp hidden dim to embedding dim
+            qkv_bias (bool): enable bias for qkv if True
+            representation_size (Optional[int]): enable and set representation layer (pre-logits) to this value if set
+            distilled (bool): model includes a distillation token and head as in DeiT models
+            drop_rate (float): dropout rate
+            attn_drop_rate (float): attention dropout rate
+            drop_path_rate (float): stochastic depth rate
+            embed_layer (nn.Module): patch embedding layer
+            norm_layer: (nn.Module): normalization layer
+            weight_init: (str): weight init scheme
+        """
+        super().__init__()
+
+        self.depth = depth
+
+        self.vit_16 = VisionTransformer(patch_size=patch_size[0], num_classes=0, embed_dim=embed_dim[0], embed_dim_map=embed_dim[1],
+                        depth=depth,num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, drop_rate=drop_rate,
+                        attn_drop_rate=attn_drop_rate, drop_path_rate=drop_path_rate, embed_layer=PatchEmbed,
+                        norm_layer=norm_layer, act_layer=act_layer, weight_init=weight_init)
+        self.vit_32 = VisionTransformer(patch_size=patch_size[1], num_classes=0, embed_dim=embed_dim[1], embed_dim_map=embed_dim[0],
+                        depth=depth,num_heads=num_heads, mlp_ratio=mlp_ratio, qkv_bias=qkv_bias, drop_rate=drop_rate,
+                        attn_drop_rate=attn_drop_rate, drop_path_rate=drop_path_rate, embed_layer=PatchEmbed,
+                        norm_layer=norm_layer, act_layer=act_layer, weight_init=weight_init)
+        #self.head = nn.Linear(2 * embed_dim, num_classes)
+        self.head = nn.Linear(embed_dim[0]+embed_dim[1], num_classes)
+
+    def forward(self, x):
+        x_16 = self.vit_16.forward_start(x) # B N C
+        x_32 = self.vit_32.forward_start(x)
+
+        for d in range(self.depth):
+            x_16 = torch.cat([x_16, self.vit_16.blocks[d].cls_map_proj(x_32[:,:1,:].detach())], dim=1)
+            x_32 = torch.cat([x_32, self.vit_32.blocks[d].cls_map_proj(x_16[:,:1,:].detach())], dim=1)
+
+            q_16, k_16, v_16 = self.vit_16.blocks[d].before_qkv(x_16)
+            q_32, k_32, v_32 = self.vit_32.blocks[d].before_qkv(x_32)
+
+            '''if d in [0,self.depth-1] or d%2==0:
+                x_16 = self.vit_16.blocks[d].after_qkv(x_16, q_16, k_16, v_16)
+                x_32 = self.vit_32.blocks[d].after_qkv(x_32, q_32, k_32, v_32)
+            else:
+                x_16 = self.vit_16.blocks[d].after_qkv(x_16, q_16, k_32, v_32)
+                x_32 = self.vit_32.blocks[d].after_qkv(x_32, q_32, k_16, v_16)'''
+
+            x_16 = self.vit_16.blocks[d].after_qkv(x_16, q_16, k_16, v_16)
+            x_32 = self.vit_32.blocks[d].after_qkv(x_32, q_32, k_32, v_32)
+
+            x_16 = x_16[:,:-1,:]
+            x_32 = x_32[:,:-1,:]
+
+        x_16 = self.vit_16.forward_end(x_16)
+        x_32 = self.vit_32.forward_end(x_32)
+
+        #x = (x_16 + x_32)/2
+        x = self.head(torch.cat([x_16, x_32], dim=-1))
+        return x
+
+
+
+########################################################################################################################
 
 
 def _init_vit_weights(module: nn.Module, name: str = '', head_bias: float = 0., jax_impl: bool = False):
@@ -668,7 +967,9 @@ def _create_vision_transformer(variant, pretrained=False, default_cfg=None, **kw
         repr_size = None
 
     model = build_model_with_cfg(
-        VisionTransformer, variant, pretrained,
+        VisionTransformer,
+        #CrossVisionTransformer,
+        variant, pretrained,
         default_cfg=default_cfg,
         representation_size=repr_size,
         pretrained_filter_fn=checkpoint_filter_fn,
@@ -682,6 +983,15 @@ def vit_tiny_patch16_224(pretrained=False, **kwargs):
     """ ViT-Tiny (Vit-Ti/16)
     """
     model_kwargs = dict(patch_size=16, embed_dim=192, depth=12, num_heads=3, **kwargs)
+    model = _create_vision_transformer('vit_tiny_patch16_224', pretrained=pretrained, **model_kwargs)
+    return model
+
+
+@register_model
+def cross_vit_tiny_patch16x32_224(pretrained=False, **kwargs):
+    """ ViT-Tiny (Vit-Ti/16)
+    """
+    model_kwargs = dict(patch_size=(16,32), embed_dim=(192,384), depth=12, num_heads=3, **kwargs)
     model = _create_vision_transformer('vit_tiny_patch16_224', pretrained=pretrained, **model_kwargs)
     return model
 

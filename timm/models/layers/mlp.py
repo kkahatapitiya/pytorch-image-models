@@ -3,6 +3,7 @@
 Hacked together by / Copyright 2020 Ross Wightman
 """
 from torch import nn as nn
+from einops import rearrange
 
 
 class Mlp(nn.Module):
@@ -117,25 +118,73 @@ class ConvMlpGeneral(nn.Module):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
+        #norm_layer=nn.BatchNorm2d
+
         #Conv = nn.Conv2d if spatial_dim=='2d' else nn.Conv1d
         #self.fc1 = Conv(in_features, hidden_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
         #self.fc2 = Conv(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
         if spatial_dim=='2d':
+            #norm_layer=nn.BatchNorm2d
+            #self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
+            #self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+            #self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+
+            #self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=(1,kernel_size), groups=groups, padding=(0,kernel_size//2), bias=True)
+            #self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=(kernel_size,1), groups=groups, padding=(kernel_size//2,0), bias=True)
+
+            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+
+            #self.fc4 = nn.Conv2d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=(kernel_size//2,kernel_size//2), bias=True)
             self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+            self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=(kernel_size//2,kernel_size//2), bias=True)
+            self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
+
         else:
+            #norm_layer=nn.BatchNorm1d
+            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
+            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+
+            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=kernel_size, groups=1, padding=kernel_size//2, bias=True)
+            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=1, padding=kernel_size//2, bias=True)
+
+            #self.fc4 = nn.Conv1d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=kernel_size//2, bias=True)
             self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+            self.fc3 = nn.Conv1d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
+            self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
+
         self.norm = norm_layer(hidden_features) if norm_layer else nn.Identity()
         self.act = act_layer()
         self.drop = nn.Dropout(drop)
+        self.spatial_dim = spatial_dim
 
     def forward(self, x):
+        #if self.spatial_dim=='2d':
+        #    b,c,h,w = x.shape
+        #    x = rearrange(x, 'b c h w-> (b h) c w')
+        '''if self.spatial_dim=='2d' or self.spatial_dim=='1d':
+            x = self.fc4(x)
+            x = self.norm(x)
+            x = self.act(x)'''
         x = self.fc1(x)
         x = self.norm(x)
+        ##if self.spatial_dim=='2d':
+        ##    x = rearrange(x, '(b h) c w-> b c h w', b=b, h=h)
+        ##    x = self.norm(x)
+        ##    x = rearrange(x, 'b c h w-> (b w) c h')
+        ##else:
+        ##    x = self.norm(x)
         x = self.act(x)
+        if self.spatial_dim=='2d' or self.spatial_dim=='1d':
+            x = self.fc3(x)
+            x = self.norm(x)
+            x = self.act(x)
         x = self.drop(x)
+        #if self.spatial_dim=='2d':
+        #    x = rearrange(x, '(b h) c w-> (b w) c h', b=b, h=h)
         x = self.fc2(x)
+        #if self.spatial_dim=='2d':
+        #    x = rearrange(x, '(b w) c h-> b c h w', b=b, w=w)
         return x
 
 
