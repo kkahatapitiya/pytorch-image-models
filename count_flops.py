@@ -12,5 +12,7 @@ inputs = (torch.randn((1,3,224,224)),)
 model = vit.vit_tiny_patch16_224()
 #model = vit.cross_vit_tiny_patch16x32_224()
 
+#print(model)
+
 flops = FlopCountAnalysis(model, inputs)
 print(flop_count_table(flops))

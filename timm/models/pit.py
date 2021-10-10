@@ -16,6 +16,7 @@ import re
 from copy import deepcopy
 from functools import partial
 from typing import Tuple
+from einops import rearrange
 
 import torch
 from torch import nn
@@ -24,7 +25,8 @@ from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from .helpers import build_model_with_cfg, overlay_external_default_cfg
 from .layers import trunc_normal_, to_2tuple
 from .registry import register_model
-from .vision_transformer import Block
+#from .vision_transformer import Block
+from .layers import PatchEmbed, Mlp, ConvMlpGeneral, DropPath
 
 
 def _cfg(url='', **kwargs):
@@ -74,9 +76,60 @@ class SequentialTuple(nn.Sequential):
         return x
 
 
+class Attention(nn.Module):
+    def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0., depth=0):
+        super().__init__()
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj = nn.Linear(dim, dim)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+
+    def forward(self, x):#, prev_q, prev_k, prev_v):
+        B, N, C = x.shape
+        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+
+        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = self.proj(x)
+        x = self.proj_drop(x)
+        return x#, q0, k0, v0
+
+
+class Block(nn.Module):
+
+    def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, drop=0., attn_drop=0.,
+                 drop_path=0., act_layer=nn.GELU, norm_layer=nn.LayerNorm, depth=0):
+        super().__init__()
+        self.norm1 = norm_layer(dim)
+        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+        self.norm2 = norm_layer(dim)
+        mlp_hidden_dim = int(dim * mlp_ratio)
+        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.H = self.W = 14
+        self.depth = depth
+
+
+    def forward(self, x):#, prev_q, prev_k, prev_v):
+        x = x + self.drop_path(self.attn(self.norm1(x))) # B N C
+        x = x + self.drop_path(self.mlp(self.norm2(x)))
+
+        return x#, prev_q, prev_k, prev_v
+
+
 class Transformer(nn.Module):
     def __init__(
-            self, base_dim, depth, heads, mlp_ratio, pool=None, drop_rate=.0, attn_drop_rate=.0, drop_path_prob=None):
+            self, base_dim, depth, heads, mlp_ratio, pool=None, drop_rate=.0, attn_drop_rate=.0, drop_path_prob=None,
+            stage=0):
         super(Transformer, self).__init__()
         self.layers = nn.ModuleList([])
         embed_dim = base_dim * heads
@@ -94,24 +147,100 @@ class Transformer(nn.Module):
             )
             for i in range(depth)])
 
-        self.pool = pool
+        if stage == 1: ##################
+            '''self.pix_select_1 = nn.Parameter(torch.FloatTensor(196, 4))
+            self.map_1 = nn.Linear(64,128)
+            self.mix = nn.Parameter(torch.FloatTensor(196, 2))'''
+            #self.conv1 = nn.Conv2d(64, 128, kernel_size=2, padding=0, stride=2, groups=64)
+            self.mix = nn.Parameter(torch.FloatTensor(196, 128, 2))
+            self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+            self.conv1 = nn.Conv2d(64, 128, kernel_size=1, padding=0, stride=1, groups=64)
+        elif stage == 2:
+            '''self.pix_select_1 = nn.Parameter(torch.FloatTensor(49, 16))
+            self.pix_select_2 = nn.Parameter(torch.FloatTensor(49, 4))
+            self.map_1 = nn.Linear(64,256)
+            self.map_2 = nn.Linear(128,256)
+            self.mix = nn.Parameter(torch.FloatTensor(49, 3))'''
+            #self.conv1 = nn.Conv2d(64, 256, kernel_size=4, padding=0, stride=4, groups=64)
+            #self.conv2 = nn.Conv2d(128, 256, kernel_size=2, padding=0, stride=2, groups=128)
+            self.mix = nn.Parameter(torch.FloatTensor(49, 256, 3))
+            self.pool1 = nn.MaxPool2d(kernel_size=4, stride=4)
+            self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+            self.conv1 = nn.Conv2d(64, 256, kernel_size=1, padding=0, stride=1, groups=64)
+            self.conv2 = nn.Conv2d(128, 256, kernel_size=1, padding=0, stride=1, groups=128)
 
-    def forward(self, x: Tuple[torch.Tensor, torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor]:
-        x, cls_tokens = x
+        self.pool = pool
+        self.depth = depth
+        self.stage = stage
+
+    def forward(self, x): #Tuple[torch.Tensor, torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor]:
+
+        #x, cls_tokens = x
+
+        x_, x__ = None, None ############
+        if self.stage == 0:
+            x, cls_tokens = x
+        elif self.stage == 1:
+            x, cls_tokens, x_ = x
+            _, C_, H_, W_ = x_.shape
+        else:
+            x, cls_tokens, x_, x__ = x
+            _, C_, H_, W_ = x_.shape
+            _, C__, H__, W__ = x__.shape
+
+
         B, C, H, W = x.shape
         token_length = cls_tokens.shape[1]
 
-        x = x.flatten(2).transpose(1, 2)
+        x = x.flatten(2).transpose(1, 2) # B N C
         x = torch.cat((cls_tokens, x), dim=1)
 
-        x = self.blocks(x)
+        #x = self.blocks(x) ###################
+
+        #########################################################################################################
+        if x_ is not None:
+            '''sc = H_//H
+            x_ = rearrange(x_.view(B,C_,H,sc,W,sc), 'b c h sh w sw -> b (h w) c (sh sw)')
+            x_ = torch.sum(x_ * self.pix_select_1.unsqueeze(0).unsqueeze(2).softmax(dim=-1), dim=-1) # B N C
+            x_ = self.map_1(x_)'''
+            #x_ = self.conv1(x_).flatten(2).transpose(1, 2)
+            x_ = self.conv1(self.pool1(x_)).flatten(2).transpose(1, 2)
+        if x__ is not None:
+            '''sc = H__//H
+            x__ = rearrange(x__.view(B,C__,H,sc,W,sc), 'b c h sh w sw -> b (h w) c (sh sw)')
+            x__ = torch.sum(x__ * self.pix_select_2.unsqueeze(0).unsqueeze(2).softmax(dim=-1), dim=-1) # B N C
+            x__ = self.map_2(x__)'''
+            #x__ = self.conv2(x__).flatten(2).transpose(1, 2)
+            x__ = self.conv2(self.pool2(x__)).flatten(2).transpose(1, 2)
+
+        for i in range(self.depth-1):
+            x = self.blocks[i](x)
+
+        cls_tokens = x[:, :token_length]
+        x = x[:, token_length:]
+
+        if self.stage == 1:
+            x = torch.stack([x, x_], dim=-1)
+            #x = torch.sum(x * self.mix.unsqueeze(0).unsqueeze(2).softmax(dim=-1), dim=-1)
+            x = torch.sum(x * self.mix.unsqueeze(0).softmax(dim=-1), dim=-1)
+        elif self.stage == 2:
+            x = torch.stack([x, x_, x__], dim=-1)
+            #x = torch.sum(x * self.mix.unsqueeze(0).unsqueeze(2).softmax(dim=-1), dim=-1)
+            x = torch.sum(x * self.mix.unsqueeze(0).softmax(dim=-1), dim=-1)
+
+        x = torch.cat((cls_tokens, x), dim=1)
+        #########################################################################################################
+
+        x = self.blocks[self.depth-1](x)
 
         cls_tokens = x[:, :token_length]
         x = x[:, token_length:]
         x = x.transpose(1, 2).reshape(B, C, H, W)
 
         if self.pool is not None:
+            x_ = x #########
             x, cls_tokens = self.pool(x, cls_tokens)
+            return x, cls_tokens, x_ ###########
         return x, cls_tokens
 
 
@@ -154,7 +283,7 @@ class PoolingVisionTransformer(nn.Module):
                  attn_drop_rate=.0, drop_rate=.0, drop_path_rate=.0):
         super(PoolingVisionTransformer, self).__init__()
 
-        padding = 0
+        padding = 4 #0 #############
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
         height = math.floor((img_size[0] + 2 * padding - patch_size[0]) / stride + 1)
@@ -173,6 +302,8 @@ class PoolingVisionTransformer(nn.Module):
         self.pos_drop = nn.Dropout(p=drop_rate)
 
         transformers = []
+
+
         # stochastic depth decay rule
         dpr = [x.tolist() for x in torch.linspace(0, drop_path_rate, sum(depth)).split(depth)]
         for stage in range(len(depth)):
@@ -182,7 +313,7 @@ class PoolingVisionTransformer(nn.Module):
                     base_dims[stage] * heads[stage], base_dims[stage + 1] * heads[stage + 1], stride=2)
             transformers += [Transformer(
                 base_dims[stage], depth[stage], heads[stage], mlp_ratio, pool=pool,
-                drop_rate=drop_rate, attn_drop_rate=attn_drop_rate, drop_path_prob=dpr[stage])
+                drop_rate=drop_rate, attn_drop_rate=attn_drop_rate, drop_path_prob=dpr[stage], stage=stage)
             ]
         self.transformers = SequentialTuple(*transformers)
         self.norm = nn.LayerNorm(base_dims[-1] * heads[-1], eps=1e-6)
@@ -219,16 +350,23 @@ class PoolingVisionTransformer(nn.Module):
         if self.head_dist is not None:
             self.head_dist = nn.Linear(self.embed_dim, self.num_classes) if num_classes > 0 else nn.Identity()
 
+
     def forward_features(self, x):
         x = self.patch_embed(x)
         x = self.pos_drop(x + self.pos_embed)
         cls_tokens = self.cls_token.expand(x.shape[0], -1, -1)
-        x, cls_tokens = self.transformers((x, cls_tokens))
+
+        #x, cls_tokens = self.transformers((x, cls_tokens)) ##################
+        x, cls_tokens, x_ = self.transformers[0]((x, cls_tokens))
+        x, cls_tokens, x__ = self.transformers[1]((x, cls_tokens, x_))
+        x, cls_tokens = self.transformers[2]((x, cls_tokens, x_, x__))
+
         cls_tokens = self.norm(cls_tokens)
         if self.head_dist is not None:
             return cls_tokens[:, 0], cls_tokens[:, 1]
         else:
             return cls_tokens[:, 0]
+
 
     def forward(self, x):
         x = self.forward_features(x)

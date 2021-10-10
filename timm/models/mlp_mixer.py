@@ -204,12 +204,12 @@ class MixerBlockConv(nn.Module):
         #self.norm1 = norm_layer(seq_len)
         # ConvMlpGeneral, ConvMlpGeneralv2
         self.mlp_tokens = ConvMlpGeneral(seq_len, tokens_dim, act_layer=act_layer, drop=drop, spatial_dim='1d',
-                                        kernel_size=5, groups=1) # groups=4
+                                        kernel_size=5, groups=1, other_dim=dim) # groups=4
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         #self.norm2 = norm_layer2(num_groups=4, num_channels=dim)
         self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
-                                        kernel_size=5, groups=1) #groups=4 groups=8 # ConvMlpGeneral
+                                        kernel_size=5, groups=1, other_dim=seq_len) #groups=4 groups=8 # ConvMlpGeneral
         #self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
         self.H = self.W = 14
         #self.attn = Attention(dim=196, num_heads=4, qkv_bias=True, attn_drop=0., proj_drop=drop)

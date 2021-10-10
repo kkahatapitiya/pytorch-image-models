@@ -38,6 +38,9 @@ default_cfgs = {
     'tnt_b_patch16_224': _cfg(
         mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5),
     ),
+    'tnt_ti_patch16_224': _cfg(
+        mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5),
+    ),
 }
 
 
@@ -85,11 +88,11 @@ class Block(nn.Module):
         self.attn_in = Attention(
             in_dim, in_dim, num_heads=in_num_head, qkv_bias=qkv_bias,
             attn_drop=attn_drop, proj_drop=drop)
-        
+
         self.norm_mlp_in = norm_layer(in_dim)
         self.mlp_in = Mlp(in_features=in_dim, hidden_features=int(in_dim * 4),
             out_features=in_dim, act_layer=act_layer, drop=drop)
-        
+
         self.norm1_proj = norm_layer(in_dim)
         self.proj = nn.Linear(in_dim * num_pixel, dim, bias=True)
         # Outer transformer
@@ -98,7 +101,7 @@ class Block(nn.Module):
             dim, dim, num_heads=num_heads, qkv_bias=qkv_bias,
             attn_drop=attn_drop, proj_drop=drop)
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-        
+
         self.norm_mlp = norm_layer(dim)
         self.mlp = Mlp(in_features=dim, hidden_features=int(dim * mlp_ratio),
             out_features=dim, act_layer=act_layer, drop=drop)
@@ -162,7 +165,7 @@ class TNT(nn.Module):
         self.num_patches = num_patches
         new_patch_size = self.pixel_embed.new_patch_size
         num_pixel = new_patch_size[0] * new_patch_size[1]
-        
+
         self.norm1_proj = norm_layer(num_pixel * in_dim)
         self.proj = nn.Linear(num_pixel * in_dim, embed_dim)
         self.norm2_proj = norm_layer(embed_dim)
@@ -212,7 +215,7 @@ class TNT(nn.Module):
     def forward_features(self, x):
         B = x.shape[0]
         pixel_embed = self.pixel_embed(x, self.pixel_pos)
-        
+
         patch_embed = self.norm2_proj(self.proj(self.norm1_proj(pixel_embed.reshape(B, self.num_patches, -1))))
         patch_embed = torch.cat((self.cls_token.expand(B, -1, -1), patch_embed), dim=1)
         patch_embed = patch_embed + self.patch_pos
@@ -247,6 +250,15 @@ def _create_tnt(variant, pretrained=False, **kwargs):
         default_cfg=default_cfgs[variant],
         pretrained_filter_fn=checkpoint_filter_fn,
         **kwargs)
+    return model
+
+
+@register_model
+def tnt_ti_patch16_224(pretrained=False, **kwargs):
+    model_cfg = dict(
+        patch_size=16, embed_dim=192, in_dim=24, depth=12, num_heads=3, in_num_head=4,
+        qkv_bias=False, **kwargs)
+    model = _create_tnt('tnt_ti_patch16_224', pretrained=pretrained, **model_cfg)
     return model
 
 

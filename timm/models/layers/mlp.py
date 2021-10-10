@@ -114,7 +114,7 @@ class ConvMlpGeneral(nn.Module):
     """
     def __init__(
             self, in_features, hidden_features=None, out_features=None, spatial_dim='2d', kernel_size=3, groups=1,
-            act_layer=nn.ReLU, norm_layer=None, drop=0.):
+            act_layer=nn.ReLU, norm_layer=None, drop=0., other_dim=None):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -123,7 +123,22 @@ class ConvMlpGeneral(nn.Module):
         #Conv = nn.Conv2d if spatial_dim=='2d' else nn.Conv1d
         #self.fc1 = Conv(in_features, hidden_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
         #self.fc2 = Conv(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
-        if spatial_dim=='2d':
+
+        if spatial_dim=='1d':
+            #norm_layer=nn.BatchNorm1d
+            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
+            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+
+            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=kernel_size, groups=1, padding=kernel_size//2, bias=True)
+            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=1, padding=kernel_size//2, bias=True)
+
+            #self.fc4 = nn.Conv1d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=kernel_size//2, bias=True)
+            self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
+            #self.fc3 = nn.Conv1d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
+            self.fc3 = nn.Linear(other_dim, other_dim)
+            self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
+
+        else:
             #norm_layer=nn.BatchNorm2d
             #self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
             #self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
@@ -137,21 +152,10 @@ class ConvMlpGeneral(nn.Module):
 
             #self.fc4 = nn.Conv2d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=(kernel_size//2,kernel_size//2), bias=True)
             self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=(kernel_size//2,kernel_size//2), bias=True)
+            #self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=(kernel_size//2,kernel_size//2), bias=True)
+            self.fc3 = nn.Linear(other_dim, other_dim)
             self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
 
-        else:
-            #norm_layer=nn.BatchNorm1d
-            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
-
-            #self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=kernel_size, groups=1, padding=kernel_size//2, bias=True)
-            #self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=kernel_size, groups=1, padding=kernel_size//2, bias=True)
-
-            #self.fc4 = nn.Conv1d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=kernel_size//2, bias=True)
-            self.fc1 = nn.Conv1d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            self.fc3 = nn.Conv1d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
-            self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
 
         self.norm = norm_layer(hidden_features) if norm_layer else nn.Identity()
         self.act = act_layer()
@@ -175,10 +179,19 @@ class ConvMlpGeneral(nn.Module):
         ##else:
         ##    x = self.norm(x)
         x = self.act(x)
-        if self.spatial_dim=='2d' or self.spatial_dim=='1d':
-            x = self.fc3(x)
-            x = self.norm(x)
-            x = self.act(x)
+
+        #if self.spatial_dim=='2d' or self.spatial_dim=='1d':
+        if self.spatial_dim=='2d':
+            b,c,h,w = x.shape
+            x = x.view(b,c,-1)
+            #x = rearrange(x, 'b c h w-> b c (h w)')
+        x = self.fc3(x)
+        x = self.norm(x)
+        x = self.act(x)
+        if self.spatial_dim=='2d':
+            x = x.view(b,c,h,w)
+            #x = rearrange(x, 'b c (h w) -> b c h w', h=h, w=w)
+
         x = self.drop(x)
         #if self.spatial_dim=='2d':
         #    x = rearrange(x, '(b h) c w-> (b w) c h', b=b, h=h)
