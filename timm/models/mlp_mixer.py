@@ -208,16 +208,24 @@ class MixerBlockConv(nn.Module):
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         #self.norm2 = norm_layer2(num_groups=4, num_channels=dim)
-        self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
+        self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='1d',
                                         kernel_size=5, groups=1, other_dim=seq_len) #groups=4 groups=8 # ConvMlpGeneral
         #self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
         self.H = self.W = 14
+        self.h, self.w = 16, 16
         #self.attn = Attention(dim=196, num_heads=4, qkv_bias=True, attn_drop=0., proj_drop=drop)
 
     def forward(self, x):
         # B N C
         x = x + self.drop_path(self.mlp_tokens(self.norm1(x)))
-        #x = x + self.drop_path(self.mlp_channels(self.norm2(x)))
+        x = x + self.drop_path(self.mlp_channels(self.norm2(x).transpose(1, 2)).transpose(1, 2))
+
+        '''res = x
+        x = self.norm1(x) # B N C
+        x = rearrange(x, 'b n (h w) -> b n h w', h=self.h, w=self.w)
+        x = self.mlp_tokens(x)
+        x = rearrange(x, 'b n h w -> b n (h w)')
+        x = res + self.drop_path(x)
 
         res = x
         #x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
@@ -226,7 +234,7 @@ class MixerBlockConv(nn.Module):
         x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
         x = self.mlp_channels(x)
         x = rearrange(x, 'b c h w -> b (h w) c')
-        x = res + self.drop_path(x)
+        x = res + self.drop_path(x)'''
 
         return x
 

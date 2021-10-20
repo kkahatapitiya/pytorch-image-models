@@ -138,6 +138,10 @@ class ConvMlpGeneral(nn.Module):
             self.fc3 = nn.Linear(other_dim, other_dim)
             self.fc2 = nn.Conv1d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
 
+            '''self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
+            self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
+            self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)'''
+
         else:
             #norm_layer=nn.BatchNorm2d
             #self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
@@ -152,8 +156,10 @@ class ConvMlpGeneral(nn.Module):
 
             #self.fc4 = nn.Conv2d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=(kernel_size//2,kernel_size//2), bias=True)
             self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            #self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=(kernel_size//2,kernel_size//2), bias=True)
-            self.fc3 = nn.Linear(other_dim, other_dim)
+            self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
+            #self.fc3 = nn.Linear(other_dim, other_dim)
+            #self.fc3 = nn.Linear(14, 14)
+            #self.fc4 = nn.Linear(14, 14)
             self.fc2 = nn.Conv2d(hidden_features, out_features, kernel_size=1, groups=1, padding=0, bias=True)
 
 
@@ -181,16 +187,20 @@ class ConvMlpGeneral(nn.Module):
         x = self.act(x)
 
         #if self.spatial_dim=='2d' or self.spatial_dim=='1d':
-        if self.spatial_dim=='2d':
+        '''if self.spatial_dim=='2d':
             b,c,h,w = x.shape
-            x = x.view(b,c,-1)
-            #x = rearrange(x, 'b c h w-> b c (h w)')
+            x = x.view(b,c,-1)'''
+        #if self.spatial_dim=='1d':
         x = self.fc3(x)
         x = self.norm(x)
         x = self.act(x)
-        if self.spatial_dim=='2d':
-            x = x.view(b,c,h,w)
-            #x = rearrange(x, 'b c (h w) -> b c h w', h=h, w=w)
+        '''else:
+            x = self.fc3(x.transpose(-1,-2)).transpose(-1,-2)
+            x = self.fc4(x)
+            x = self.norm(x)
+            x = self.act(x)'''
+        '''if self.spatial_dim=='2d':
+            x = x.view(b,c,h,w)'''
 
         x = self.drop(x)
         #if self.spatial_dim=='2d':

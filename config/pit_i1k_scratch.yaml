@@ -6,7 +6,7 @@ val_split: validation
 model: pit_ti_224 #cross_vit_tiny_patch16x32_224 #vit_tiny_patch16_224 #vit_small_patch16_224 #vit_base_patch16_224
 pretrained: false #true #false
 initial_checkpoint: ''
-resume: 'output/train/20211003-124150-pit_ti_224-224/model_best.pth.tar' #''
+resume: '' #'output/train/20211003-124150-pit_ti_224-224/model_best.pth.tar' #''
 no_resume_opt: false
 num_classes: 1000
 gp: null
