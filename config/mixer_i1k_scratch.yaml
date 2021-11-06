@@ -6,7 +6,7 @@ val_split: validation
 model: mixer_ti16_224 #vit_small_patch16_224 #vit_base_patch16_224
 pretrained: false #true #false
 initial_checkpoint: ''
-resume: '' #'output/train/20210930-120247-mixer_ti16_224-224/model_best.pth.tar' #''
+resume: '' #'output/train/20211023-202214-mixer_ti16_224-224/model_best.pth.tar' #''
 no_resume_opt: false
 num_classes: 1000
 gp: null
@@ -23,7 +23,7 @@ std:
 - 0.225 #null ###
 interpolation: ''
 batch_size: 512 #768 #1024 #768 #1024 #682 #512 #4096 #224 ###
-validation_batch_size_multiplier: 4 #3 #2 #3 #4
+validation_batch_size_multiplier: 1 #4 #3 #2 #3 #4
 
 # Optimizer parameters
 opt: adamw
@@ -103,7 +103,7 @@ seed: 42
 log_interval: 50
 recovery_interval: 0
 checkpoint_hist: 10
-workers: 16 #16 #4
+workers: 8 #16 #16 #4
 save_images: false
 amp: false
 apex_amp: true #false ###

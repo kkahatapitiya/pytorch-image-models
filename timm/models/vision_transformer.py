@@ -206,8 +206,14 @@ class Attention(nn.Module):
 
     def forward(self, x):#, prev_q, prev_k, prev_v):
         B, N, C = x.shape
+
+        #res = x.reshape(B, N, self.num_heads, C // self.num_heads).permute(0, 2, 1, 3)
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
+
+        '''q += res
+        k += res
+        v += res'''
 
         #q0, k0, v0 = q, k, v
         '''
@@ -257,6 +263,72 @@ class Attention(nn.Module):
         return x#, q0, k0, v0
 
 
+
+class ConvAttention(nn.Module):
+    def __init__(self, dim, num_heads=8, qkv_bias=False, attn_drop=0., proj_drop=0., depth=0):
+        super().__init__()
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+        self.h = self.w = 8
+        self.c = 3 # SAME AS NUM OF HEADS
+        #self.N = 14*14
+
+        self.qkv_linear = nn.Linear(dim, dim * 3, bias=qkv_bias)
+
+        self.qkv = nn.Conv2d(self.c, self.c*3, kernel_size=3, groups=1, padding=1, bias=qkv_bias)
+        #self.qkv1 = nn.Conv2d(self.c, 16, kernel_size=3, groups=1, padding=1, bias=qkv_bias)
+        #self.qkv2 = nn.Conv2d(16, self.c*3, kernel_size=1, groups=1, padding=0, bias=qkv_bias)
+        #self.act = nn.GELU()
+        #self.norm = nn.LayerNorm(dim)
+
+        self.proj = nn.Conv2d(self.c, self.c, kernel_size=3, groups=1, padding=1, bias=qkv_bias)
+        #self.proj1 = nn.Conv2d(self.c, 16, kernel_size=3, groups=1, padding=1, bias=qkv_bias)
+        #self.proj2 = nn.Conv2d(16, self.c, kernel_size=1, groups=1, padding=0, bias=qkv_bias)
+        self.proj_linear = nn.Linear(dim, dim)
+
+
+    def forward(self, x):#, prev_q, prev_k, prev_v):
+        B, N, C = x.shape
+
+        qkv_l = self.qkv_linear(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+
+        x = rearrange(x, 'b n (c h w) -> (b n) c h w', c=self.c, h=self.h, w=self.w)#.contiguous()
+        qkv = self.qkv(x)
+        #qkv = self.qkv2(self.act(self.qkv1(x)))
+        qkv = rearrange(qkv, '(b n) (cx c) h w -> cx b c n (h w)', b=B, n=N, cx=3, c=self.num_heads)#.contiguous() # 3 B h N C//h
+        '''qkv = rearrange(qkv, '(b n) (cx c) h w -> (b n) cx (c h w)', b=B, n=N, cx=3, c=self.c)
+        qkv = self.norm(qkv)
+        qkv = rearrange(qkv, '(b n) cx (c h w) -> cx b c n (h w)', b=B, n=N, c=self.num_heads, h=self.h, w=self.w)#.contiguous() # 3 B h N C//h'''
+
+        qkv = qkv + qkv_l
+        q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple) # B h N C//h
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.attn_drop(attn)
+
+        x_attn = (attn @ v) # B h N C//h
+
+        x = rearrange(x_attn, 'b c n (h w) -> (b n) c h w', h=self.h, w=self.w)#.contiguous()
+        x = self.proj(x)
+        #x = self.proj2(self.act(self.proj1(x)))
+        x = rearrange(x, '(b n) c h w -> b n (c h w)', b=B, n=N, c=self.num_heads)#.contiguous()
+        #x = self.proj_drop(x)
+
+        x_l = x_attn.transpose(1, 2).reshape(B, N, C)
+        x_l = self.proj_linear(x_l)
+
+        x = x + x_l
+        x = self.proj_drop(x)
+
+        return x#, q0, k0, v0
+
+
 class Block(nn.Module):
 
     def __init__(self, dim, num_heads, mlp_ratio=4., qkv_bias=False, drop=0., attn_drop=0.,
@@ -265,31 +337,36 @@ class Block(nn.Module):
         self.norm1 = norm_layer(dim)
         seq = 196
 
-        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
+        #self.attn = Attention(dim, num_heads=3, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
+        self.attn = ConvAttention(dim, num_heads=3, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop, depth=depth)
         #self.mlp_tokens = Mlp(197, dim//2, act_layer=act_layer, drop=drop)
         # NOTE: drop path for stochastic depth, we shall see if this is better than dropout here
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         #self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
         self.mlp = ConvMlpGeneral(dim, mlp_hidden_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
-                                    kernel_size=9, groups=1, other_dim=seq)
+                                    kernel_size=5, groups=mlp_hidden_dim, other_dim=seq)
 
         #self.norm2 = norm_layer(seq)
-        #self.attn2 = Attention2(seq_len=seq, dim=dim, num_heads=4, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
+        ##self.attn2 = Attention2(seq_len=seq, dim=dim, num_heads=4, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
         #self.attn2 = Attention(seq, num_heads=4, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
         self.H = self.W = 14
         self.depth = depth
 
 
     def forward(self, x):#, prev_q, prev_k, prev_v):
-        x = x + self.drop_path(self.attn(self.norm1(x))) # B N C
+        #x = x + self.drop_path(self.attn(self.norm1(x))) # B N C
         #x_, prev_q, prev_k, prev_v = self.attn(self.norm1(x), prev_q, prev_k, prev_v)
         ##x__ = self.mlp_tokens(self.norm1(x).transpose(1, 2)).transpose(1, 2)
         ##x = x + self.drop_path((x_ + x__)/2.)
         #x = x + self.drop_path(x_)
 
+        x = x + self.drop_path(self.attn(self.norm1(x))) # B N C
         #x = x + self.drop_path(self.mlp(self.norm2(x)))
+
+        #x = x + self.drop_path(self.attn2(self.norm2(x.transpose(-1,-2))).transpose(-1,-2))
 
         res = x
         x = self.norm2(x) # B N C
@@ -298,9 +375,8 @@ class Block(nn.Module):
         x = rearrange(x, 'b c h w -> b (h w) c')
         x = res + self.drop_path(x)
 
-        #x = x + self.drop_path(self.attn2(self.norm2(x).transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous())
-        #x = x + self.drop_path(self.attn2(self.norm2(x.transpose(-1,-2))).transpose(-1,-2))
 
+        #x = x + self.drop_path(self.attn2(self.norm2(x).transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous())
         #x_skip = x
         #x = self.norm2(x)
         #x =torch.cat([self.mlp(x[:,0:1,:]), self.attn2(x[:,1:,:].transpose(-1,-2).contiguous()).transpose(-1,-2).contiguous()], dim=1)
@@ -694,6 +770,7 @@ class VisionTransformer(nn.Module):
         self.cls_token = None #######nn.Parameter(torch.zeros(1, 1, embed_dim)) #None #nn.Parameter(torch.zeros(1, 1, embed_dim))
         self.dist_token = None ########nn.Parameter(torch.zeros(1, 1, embed_dim)) if distilled else None #None #nn.Parameter(torch.zeros(1, 1, embed_dim)) if distilled else None
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + self.num_tokens, embed_dim))
+        #self.pos_embed2 = nn.Parameter(torch.zeros(1, num_patches + self.num_tokens, embed_dim))
         self.pos_drop = nn.Dropout(p=drop_rate)
 
         #self.H = self.W = 7 #14 #7
@@ -795,6 +872,9 @@ class VisionTransformer(nn.Module):
         #x = rearrange(x, 'b (h sh w sw) c -> b (h w) (sh sw) c', h=self.H, w=self.W, sh=self.sh, sw=self.sw) # B N M C
 
         #x = rearrange(x, 'b (h sh w sw) c -> b (h w sh sw) c', h=2, w=2, sh=7, sw=7) # B N C
+        #x = rearrange(x, 'b n (c h sh w sw) -> b n (h w c sh sw)', c=3, h=2, w=2, sh=4, sw=4) # B N C
+
+        #x = rearrange(x, 'b n (c hw) -> b n (hw c)', c=3) # B N C
 
         x = self.blocks(x)
 

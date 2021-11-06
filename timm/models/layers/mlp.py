@@ -156,7 +156,9 @@ class ConvMlpGeneral(nn.Module):
 
             #self.fc4 = nn.Conv2d(in_features, in_features, kernel_size=kernel_size, groups=in_features, padding=(kernel_size//2,kernel_size//2), bias=True)
             self.fc1 = nn.Conv2d(in_features, hidden_features, kernel_size=1, groups=1, padding=0, bias=True)
-            self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
+            #self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=hidden_features, padding=kernel_size//2, bias=True)
+            self.fc3 = nn.Conv2d(hidden_features, hidden_features, kernel_size=kernel_size, groups=groups, padding=kernel_size//2, bias=True)
+            #self.fc4 = nn.Conv2d(out_features, out_features, kernel_size=kernel_size, groups=out_features, padding=kernel_size//2, bias=True)
             #self.fc3 = nn.Linear(other_dim, other_dim)
             #self.fc3 = nn.Linear(14, 14)
             #self.fc4 = nn.Linear(14, 14)
@@ -203,11 +205,18 @@ class ConvMlpGeneral(nn.Module):
             x = x.view(b,c,h,w)'''
 
         x = self.drop(x)
+
         #if self.spatial_dim=='2d':
         #    x = rearrange(x, '(b h) c w-> (b w) c h', b=b, h=h)
         x = self.fc2(x)
         #if self.spatial_dim=='2d':
         #    x = rearrange(x, '(b w) c h-> b c h w', b=b, w=w)
+
+        '''x = self.norm(x)
+        x = self.act(x)
+        x = self.drop(x)
+        x = self.fc4(x)'''
+
         return x
 
 
