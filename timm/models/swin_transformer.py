@@ -15,6 +15,7 @@ import logging
 import math
 from copy import deepcopy
 from typing import Optional
+from einops import rearrange
 
 import torch
 import torch.nn as nn
@@ -22,7 +23,7 @@ import torch.utils.checkpoint as checkpoint
 
 from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from .helpers import build_model_with_cfg, overlay_external_default_cfg
-from .layers import PatchEmbed, Mlp, DropPath, to_2tuple, trunc_normal_
+from .layers import PatchEmbed, Mlp, ConvMlpGeneral, DropPath, to_2tuple, trunc_normal_
 from .registry import register_model
 from .vision_transformer import checkpoint_filter_fn, _init_vit_weights
 
@@ -198,6 +199,114 @@ class WindowAttention(nn.Module):
         return x
 
 
+
+class ConvWindowAttention(nn.Module):
+    r""" Window based multi-head self attention (W-MSA) module with relative position bias.
+    It supports both of shifted and non-shifted window.
+
+    Args:
+        dim (int): Number of input channels.
+        window_size (tuple[int]): The height and width of the window.
+        num_heads (int): Number of attention heads.
+        qkv_bias (bool, optional):  If True, add a learnable bias to query, key, value. Default: True
+        attn_drop (float, optional): Dropout ratio of attention weight. Default: 0.0
+        proj_drop (float, optional): Dropout ratio of output. Default: 0.0
+    """
+
+    def __init__(self, dim, window_size, num_heads, qkv_bias=True, attn_drop=0., proj_drop=0.):
+
+        super().__init__()
+        self.dim = dim
+        self.window_size = window_size  # Wh, Ww
+        self.num_heads = num_heads
+        head_dim = dim // num_heads
+        self.scale = head_dim ** -0.5
+
+        # define a parameter table of relative position bias
+        self.relative_position_bias_table = nn.Parameter(
+            torch.zeros((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads))  # 2*Wh-1 * 2*Ww-1, nH
+
+        # get pair-wise relative position index for each token inside the window
+        coords_h = torch.arange(self.window_size[0])
+        coords_w = torch.arange(self.window_size[1])
+        coords = torch.stack(torch.meshgrid([coords_h, coords_w]))  # 2, Wh, Ww
+        coords_flatten = torch.flatten(coords, 1)  # 2, Wh*Ww
+        relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]  # 2, Wh*Ww, Wh*Ww
+        relative_coords = relative_coords.permute(1, 2, 0).contiguous()  # Wh*Ww, Wh*Ww, 2
+        relative_coords[:, :, 0] += self.window_size[0] - 1  # shift to start from 0
+        relative_coords[:, :, 1] += self.window_size[1] - 1
+        relative_coords[:, :, 0] *= 2 * self.window_size[1] - 1
+        relative_position_index = relative_coords.sum(-1)  # Wh*Ww, Wh*Ww
+        self.register_buffer("relative_position_index", relative_position_index)
+
+        '''self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.proj = nn.Linear(dim, dim)'''
+
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+        self.c, self.h, self.w, self.ks = {96:(24,2,2,1), 192:(12,4,4,1), 384:(6,8,8,3), 768:(3,16,16,5)}[self.dim]
+        #heads=(3, 6, 12, 24)
+        self.qkv = nn.Conv2d(self.c, self.c*3, kernel_size=self.ks, groups=1, padding=self.ks//2, bias=qkv_bias)
+        self.qkv_linear = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.proj = nn.Conv2d(self.c, self.c, kernel_size=self.ks, groups=1, padding=self.ks//2, bias=qkv_bias)
+        self.proj_linear = nn.Linear(dim, dim)
+
+        trunc_normal_(self.relative_position_bias_table, std=.02)
+        self.softmax = nn.Softmax(dim=-1)
+
+    def forward(self, x, mask: Optional[torch.Tensor] = None):
+        """
+        Args:
+            x: input features with shape of (num_windows*B, N, C)
+            mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
+        """
+        B_, N, C = x.shape
+        #qkv = self.qkv(x).reshape(B_, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        #q, k, v = qkv[0], qkv[1], qkv[2]  # make torchscript happy (cannot use tensor as tuple)
+
+        qkv_l = self.qkv_linear(x).reshape(B_, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        x = rearrange(x, 'b n (c h w) -> (b n) c h w', c=self.c, h=self.h, w=self.w)#.contiguous()
+        qkv = self.qkv(x)
+        qkv = rearrange(qkv, '(b n) (cx c) h w -> cx b n (c h w)', b=B_, n=N, cx=3, c=self.c)#.contiguous() # 3 B h N C//h
+        qkv = rearrange(qkv, 'cx b n (hd chd) -> cx b hd n chd', hd=self.num_heads)
+        qkv = (qkv + qkv_l) * 0.5
+        q, k, v = qkv[0], qkv[1], qkv[2]
+
+        q = q * self.scale
+        attn = (q @ k.transpose(-2, -1))
+
+        relative_position_bias = self.relative_position_bias_table[self.relative_position_index.view(-1)].view(
+            self.window_size[0] * self.window_size[1], self.window_size[0] * self.window_size[1], -1)  # Wh*Ww,Wh*Ww,nH
+        relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()  # nH, Wh*Ww, Wh*Ww
+        attn = attn + relative_position_bias.unsqueeze(0)
+
+        if mask is not None:
+            nW = mask.shape[0]
+            attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(0)
+            attn = attn.view(-1, self.num_heads, N, N)
+            attn = self.softmax(attn)
+        else:
+            attn = self.softmax(attn)
+
+        attn = self.attn_drop(attn)
+
+        #x = (attn @ v).transpose(1, 2).reshape(B_, N, C)
+        #x = self.proj(x)
+
+        x_attn = (attn @ v) # B h N C//h
+        x = rearrange(x_attn, 'b hd n chd -> b n (hd chd)')#.contiguous()
+        x = rearrange(x, 'b n (c h w) -> (b n) c h w', c=self.c, h=self.h, w=self.w)#.contiguous()
+        x = self.proj(x)
+        x = rearrange(x, '(b n) c h w -> b n (c h w)', b=B_, n=N)#.contiguous()
+        x_l = x_attn.transpose(1, 2).reshape(B_, N, C)
+        x_l = self.proj_linear(x_l)
+        x = (x + x_l) * 0.5
+
+        x = self.proj_drop(x)
+        return x
+
+
 class SwinTransformerBlock(nn.Module):
     r""" Swin Transformer Block.
 
@@ -233,14 +342,25 @@ class SwinTransformerBlock(nn.Module):
         assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
 
         self.norm1 = norm_layer(dim)
-        self.attn = WindowAttention(
-            dim, window_size=to_2tuple(self.window_size), num_heads=num_heads, qkv_bias=qkv_bias,
-            attn_drop=attn_drop, proj_drop=drop)
+
+        if self.shift_size > 0:
+            self.attn = WindowAttention(
+                dim, window_size=to_2tuple(self.window_size), num_heads=num_heads, qkv_bias=qkv_bias,
+                attn_drop=attn_drop, proj_drop=drop)
+        else:
+            # ConvWindowAttention, WindowAttention
+            self.attn = ConvWindowAttention(
+                dim, window_size=to_2tuple(self.window_size), num_heads=num_heads, qkv_bias=qkv_bias,
+                attn_drop=attn_drop, proj_drop=drop)
 
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
-        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+
+        #self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.ks = {56:5, 28:5, 14:5, 7:3}[self.input_resolution[0]]
+        self.mlp = ConvMlpGeneral(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
+                                    kernel_size=self.ks, groups=mlp_hidden_dim)
 
         if self.shift_size > 0:
             # calculate attention mask for SW-MSA
@@ -302,7 +422,15 @@ class SwinTransformerBlock(nn.Module):
 
         # FFN
         x = shortcut + self.drop_path(x)
-        x = x + self.drop_path(self.mlp(self.norm2(x)))
+
+        #x = x + self.drop_path(self.mlp(self.norm2(x)))
+
+        res = x
+        x = self.norm2(x) # B N C
+        x = rearrange(x, 'b (h w) c -> b c h w', h=H, w=W)
+        x = self.mlp(x)
+        x = rearrange(x, 'b c h w -> b (h w) c')
+        x = res + self.drop_path(x)
 
         return x
 
@@ -320,8 +448,13 @@ class PatchMerging(nn.Module):
         super().__init__()
         self.input_resolution = input_resolution
         self.dim = dim
-        self.reduction = nn.Linear(4 * dim, 2 * dim, bias=False)
-        self.norm = norm_layer(4 * dim)
+
+        '''self.reduction = nn.Linear(4 * dim, 2 * dim, bias=False)
+        self.norm = norm_layer(4 * dim)'''
+
+        self.c, self.h, self.w, self.ks = {56:(24,2,2,3), 28:(12,4,4,5), 14:(6,8,8,9)}[self.input_resolution[0]]
+        self.reduction = nn.Conv2d(self.c, self.c//2, kernel_size=self.ks, groups=1, stride=1, padding=self.ks//2, bias=False)
+        self.norm = norm_layer(self.c)
 
     def forward(self, x):
         """
@@ -332,17 +465,22 @@ class PatchMerging(nn.Module):
         assert L == H * W, "input feature has wrong size"
         assert H % 2 == 0 and W % 2 == 0, f"x size ({H}*{W}) are not even."
 
-        x = x.view(B, H, W, C)
-
+        '''x = x.view(B, H, W, C)
         x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
         x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
         x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
         x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
         x = torch.cat([x0, x1, x2, x3], -1)  # B H/2 W/2 4*C
         x = x.view(B, -1, 4 * C)  # B H/2*W/2 4*C
-
         x = self.norm(x)
+        x = self.reduction(x)'''
+
+        # B 24 112 112
+        x = rearrange(x, 'b (H W) (c h w) -> b (H h) (W w) c', H=H, W=W, c=self.c, h=self.h, w=self.w)
+        x = self.norm(x)
+        x = rearrange(x, 'b h1 w1 c -> b c h1 w1')
         x = self.reduction(x)
+        x = rearrange(x, 'b c (H h) (W w) -> b (H W) (c h w)', H=H//2, W=W//2, c=self.c//2, h=self.h*2, w=self.w*2)
 
         return x
 

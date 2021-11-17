@@ -199,7 +199,17 @@ class MixerBlockConv(nn.Module):
 
         self.H = self.W = 14
         self.h =self.w = 8 #16
-        self.c = 4
+        self.c = 4 # Mixer-Ti
+        #self.c = 8 # Mixer-S
+        self.ks1 = 3
+        self.ks2 = 5
+
+        # Mixer B/32
+        '''self.H = self.W = 7
+        self.h =self.w = 16 #16
+        self.c = 3
+        self.ks1 = 5
+        self.ks2 = 3'''
 
         #norm_layer=nn.BatchNorm1d
         #norm_layer2=nn.BatchNorm2d
@@ -208,22 +218,23 @@ class MixerBlockConv(nn.Module):
         self.norm1 = norm_layer(dim)
         #self.norm1 = norm_layer(seq_len)
         # ConvMlpGeneral, ConvMlpGeneralv2
-        self.mlp_tokens = ConvMlpGeneral(seq_len*1, tokens_dim*1, act_layer=act_layer, drop=drop, spatial_dim='2d',
-                                        kernel_size=3, groups=tokens_dim, other_dim=dim) # groups=4
+        #self.mlp_tokens = Mlp(seq_len, tokens_dim, act_layer=act_layer, drop=drop)
+        self.mlp_tokens = ConvMlpGeneral(seq_len*1, tokens_dim*1, act_layer=act_layer, drop=drop, spatial_dim='1d',
+                                        kernel_size=self.ks1, groups=tokens_dim, other_dim=dim) # groups=4
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(dim)
         #self.norm2 = norm_layer2(num_groups=4, num_channels=dim)
-        self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
-                                        kernel_size=5, groups=channels_dim, other_dim=seq_len) #groups=4 groups=8 # ConvMlpGeneral
+        self.mlp_channels = ConvMlpGeneral(dim, channels_dim, act_layer=act_layer, drop=drop, spatial_dim='1d',
+                                        kernel_size=self.ks2, groups=channels_dim, other_dim=seq_len) #groups=4 groups=8 # ConvMlpGeneral
         #self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
         #self.attn = Attention(dim=196, num_heads=4, qkv_bias=True, attn_drop=0., proj_drop=drop)
 
     def forward(self, x):
         # B N C
-        #x = x + self.drop_path(self.mlp_tokens(self.norm1(x)))
-        #x = x + self.drop_path(self.mlp_channels(self.norm2(x).transpose(1, 2)).transpose(1, 2))
+        x = x + self.drop_path(self.mlp_tokens(self.norm1(x)))
+        x = x + self.drop_path(self.mlp_channels(self.norm2(x).transpose(1, 2)).transpose(1, 2))
 
-        res = x
+        '''res = x
         x = self.norm1(x) # B N C
         x = rearrange(x, 'b n (c h w) -> (b c) n h w', h=self.h, w=self.w, c=self.c)
         x = self.mlp_tokens(x)
@@ -237,7 +248,7 @@ class MixerBlockConv(nn.Module):
         x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
         x = self.mlp_channels(x)
         x = rearrange(x, 'b c h w -> b (h w) c')
-        x = res + self.drop_path(x)
+        x = res + self.drop_path(x)'''
 
         return x
 
@@ -273,6 +284,53 @@ class ResBlock(nn.Module):
     def forward(self, x):
         x = x + self.drop_path(self.ls1 * self.linear_tokens(self.norm1(x).transpose(1, 2)).transpose(1, 2))
         x = x + self.drop_path(self.ls2 * self.mlp_channels(self.norm2(x)))
+        return x
+
+
+class ResBlockConv(nn.Module):
+    """ Residual MLP block w/ LayerScale and Affine 'norm'
+
+    Based on: `ResMLP: Feedforward networks for image classification...` - https://arxiv.org/abs/2105.03404
+    """
+    def __init__(
+            self, dim, seq_len, mlp_ratio=4, mlp_layer=Mlp, norm_layer=Affine,
+            act_layer=nn.GELU, init_values=1e-4, drop=0., drop_path=0.):
+        super().__init__()
+        channel_dim = int(dim * mlp_ratio)
+        self.norm1 = norm_layer(dim)
+        #self.linear_tokens = nn.Linear(seq_len, seq_len)
+        self.linear_tokens1 = nn.Conv2d(seq_len, seq_len, kernel_size=1, groups=1, padding=0, bias=True)
+        self.linear_tokens2 = nn.Conv2d(seq_len, seq_len, kernel_size=3, groups=seq_len, padding=3//2, bias=True)
+        self.act = act_layer()
+
+        self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+        self.norm2 = norm_layer(dim)
+        #self.mlp_channels = mlp_layer(dim, channel_dim, act_layer=act_layer, drop=drop)
+        self.mlp_channels = ConvMlpGeneral(dim, channel_dim, act_layer=act_layer, drop=drop, spatial_dim='2d',
+                                        kernel_size=5, groups=channel_dim, other_dim=seq_len)
+        self.ls1 = nn.Parameter(init_values * torch.ones(dim))
+        self.ls2 = nn.Parameter(init_values * torch.ones(dim))
+
+        self.H = self.W = 14
+        self.h =self.w = 8 #16
+        self.c = 6 #4 * 2
+
+    def forward(self, x):
+
+        res = x
+        x = self.norm1(x) # B N C
+        x = rearrange(x, 'b n (c h w) -> (b c) n h w', h=self.h, w=self.w, c=self.c)
+        x = self.linear_tokens2(self.act(self.linear_tokens1(x)))
+        x = rearrange(x, '(b c) n h w -> b n (c h w)', c=self.c)
+        x = res + self.drop_path(x * self.ls1)
+
+        res = x
+        x = self.norm2(x) # B N C
+        x = rearrange(x, 'b (h w) c -> b c h w', h=self.H, w=self.W)
+        x = self.mlp_channels(x)
+        x = rearrange(x, 'b c h w -> b (h w) c')
+        x = res + self.drop_path(x * self.ls2)
+
         return x
 
 
@@ -583,6 +641,9 @@ def resmlp_12_224(pretrained=False, **kwargs):
     """ ResMLP-12
     Paper: `ResMLP: Feedforward networks for image classification...` - https://arxiv.org/abs/2105.03404
     """
+    #model_args = dict(
+    #    patch_size=16, num_blocks=12, embed_dim=384, mlp_ratio=4, block_layer=ResBlockConv, norm_layer=Affine, **kwargs)
+    #model = _create_mixer('resmlp_12_224', pretrained=pretrained, **model_args)
     model_args = dict(
         patch_size=16, num_blocks=12, embed_dim=384, mlp_ratio=4, block_layer=ResBlock, norm_layer=Affine, **kwargs)
     model = _create_mixer('resmlp_12_224', pretrained=pretrained, **model_args)
