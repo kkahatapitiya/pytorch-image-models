@@ -54,6 +54,9 @@ def load_checkpoint(model, checkpoint_path, use_ema=False, strict=True):
         return
     state_dict = load_state_dict(checkpoint_path, use_ema)
     model.load_state_dict(state_dict, strict=strict)
+    '''state_to_update = model.state_dict()
+    state_to_update.update(state_dict)
+    model.load_state_dict(state_to_update)'''
 
 
 def resume_checkpoint(model, checkpoint_path, optimizer=None, loss_scaler=None, log_info=True):
@@ -68,16 +71,25 @@ def resume_checkpoint(model, checkpoint_path, optimizer=None, loss_scaler=None, 
                 name = k[7:] if k.startswith('module') else k
                 new_state_dict[name] = v
             model.load_state_dict(new_state_dict)
+            '''state_to_update = model.state_dict()
+            state_to_update.update(new_state_dict)
+            model.load_state_dict(state_to_update)'''
 
             if optimizer is not None and 'optimizer' in checkpoint:
                 if log_info:
                     _logger.info('Restoring optimizer state from checkpoint...')
                 optimizer.load_state_dict(checkpoint['optimizer'])
+                '''state_to_update = optimizer.state_dict()
+                state_to_update.update(checkpoint['optimizer'])
+                optimizer.load_state_dict(state_to_update)'''
 
             if loss_scaler is not None and loss_scaler.state_dict_key in checkpoint:
                 if log_info:
                     _logger.info('Restoring AMP loss scaler state from checkpoint...')
                 loss_scaler.load_state_dict(checkpoint[loss_scaler.state_dict_key])
+                '''state_to_update = loss_scaler.state_dict()
+                state_to_update.update(checkpoint[loss_scaler.state_dict_key])
+                loss_scaler.load_state_dict(state_to_update)'''
 
             if 'epoch' in checkpoint:
                 resume_epoch = checkpoint['epoch']

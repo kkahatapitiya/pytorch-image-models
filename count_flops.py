@@ -9,9 +9,12 @@ inputs = (torch.randn((1,3,224,224)),)
 
 #model = models.resnet18()
 #model = mm.mixer_ti16_224()
-model = vit.vit_tiny_patch16_224()
+#model = vit.vit_tiny_patch16_224()
 #model = vit.cross_vit_tiny_patch16x32_224()
 #model = pit.pit_ti_224(False)
+
+#model = vit.vit_base_patch16_224()
+model = vit.vit_small_patch16_224()
 
 #print(model)
 

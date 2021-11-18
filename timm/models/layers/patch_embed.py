@@ -86,22 +86,50 @@ class PatchEmbed(nn.Module):
         self.flatten = flatten
 
         #self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
+        #self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
 
+        # ViT-Ti
         #self.proj2 = nn.Conv2d(in_chans, 1, kernel_size=1, stride=1)
         #self.proj2 = nn.Conv2d(in_chans, 3, kernel_size=2, stride=2)
-        self.proj21 = nn.Conv2d(in_chans, 128, kernel_size=4, stride=2, padding=1)
+        '''self.proj21 = nn.Conv2d(in_chans, 128, kernel_size=4, stride=2, padding=1)
         self.proj22 = nn.Conv2d(128, 3, kernel_size=1, stride=1)
         self.act = nn.GELU()
         self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
         self.norm2 = norm_layer(128) if norm_layer else nn.Identity()
-        #self.pos_embed2 = nn.Parameter(torch.zeros(1, 128, 8, 8))
-        #trunc_normal_(self.pos_embed2, std=.02)
+        self.pos_embed2 = nn.Parameter(torch.zeros(1, 128, 8, 8))
+        trunc_normal_(self.pos_embed2, std=.02)'''
 
+        # ViT-S
+        '''self.proj21 = nn.Conv2d(in_chans, 128, kernel_size=4, stride=2, padding=1)
+        self.proj22 = nn.Conv2d(128, 6, kernel_size=1, stride=1)
+        self.act = nn.GELU()
+        self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
+        self.norm2 = norm_layer(128) if norm_layer else nn.Identity()
+        self.pos_embed2 = nn.Parameter(torch.zeros(1, 128, 8, 8))
+        trunc_normal_(self.pos_embed2, std=.02)'''
+
+        # ViT-B/32
+        '''self.proj21 = nn.Conv2d(in_chans, 128, kernel_size=4, stride=2, padding=1)
+        self.proj22 = nn.Conv2d(128, 12, kernel_size=2, stride=2)
+        self.act = nn.GELU()
+        self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
+        self.norm2 = norm_layer(128) if norm_layer else nn.Identity()
+        self.pos_embed2 = nn.Parameter(torch.zeros(1, 128, 16, 16))
+        trunc_normal_(self.pos_embed2, std=.02)'''
+
+        # Mixer-Ti
         '''self.proj21 = nn.Conv2d(in_chans, 64, kernel_size=2, stride=2) # B 32 112 112
         self.proj22 = nn.Conv2d(64, 4, kernel_size=1, stride=1) # B 32 112 112
         self.act = nn.GELU() #nn.Identity() #nn.GELU()
         self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
         self.norm2 = norm_layer(64) if norm_layer else nn.Identity()'''
+
+        # Mixer B/32
+        self.proj21 = nn.Conv2d(in_chans, 64*2, kernel_size=2, stride=2) # B 32 112 112
+        self.proj22 = nn.Conv2d(64*2, 3, kernel_size=1, stride=1) # B 32 112 112
+        self.act = nn.GELU() #nn.Identity() #nn.GELU()
+        self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
+        self.norm2 = norm_layer(64*2) if norm_layer else nn.Identity()
 
     def forward(self, x):
         B, C, H, W = x.shape
@@ -110,15 +138,27 @@ class PatchEmbed(nn.Module):
 
         #x = self.proj(x)
 
-        #for Vit
-        #x1 = self.proj(x) # B 192 14 14
+        #for Vit-Ti
+        '''#x1 = self.proj(x) # B 192 14 14
         #x2 = self.proj2(x)
-        x2 = self.norm2(self.act(self.proj21(x)))# + self.pos_embed2.repeat(1,1,14,14))) # B 128 112 112
+        x2 = self.norm2(self.act(self.proj21(x)  + self.pos_embed2.repeat(1,1,14,14))) # B 128 112 112
         x2 = self.proj22(x2)
         #x2 = rearrange(x2, 'b c (n1 p1) (n2 p2) -> b (c p1 p2) n1 n2', n1=14, n2=14, p1=16, p2=16)
         x2 = rearrange(x2, 'b c (n1 p1) (n2 p2) -> b (c p1 p2) n1 n2', n1=14, n2=14, p1=8, p2=8)
         #x = x1 + x2
-        x = x2
+        x = x2'''
+
+        # ViT-S
+        '''x2 = self.norm2(self.act(self.proj21(x)  + self.pos_embed2.repeat(1,1,14,14))) # B 128 224 224
+        x2 = self.proj22(x2)
+        x2 = rearrange(x2, 'b c (n1 p1) (n2 p2) -> b (c p1 p2) n1 n2', n1=14, n2=14, p1=8, p2=8)
+        x = x2'''
+
+        # ViT-B/32
+        '''x2 = self.norm2(self.act(self.proj21(x)  + self.pos_embed2.repeat(1,1,7,7))) # B 128 224 224
+        x2 = self.proj22(x2)
+        x2 = rearrange(x2, 'b c (n1 p1) (n2 p2) -> b (c p1 p2) n1 n2', n1=7, n2=7, p1=8, p2=8)
+        x = x2'''
 
         #for mixer
         '''#x1 = self.proj(x) # B 256 14 14
@@ -127,6 +167,12 @@ class PatchEmbed(nn.Module):
         x2 = rearrange(x2, 'b c (n1 p1) (n2 p2) -> b (c p1 p2) n1 n2', n1=14, n2=14, p1=8, p2=8)
         #x = x1 + x2
         x = x2'''
+
+        x2 = self.norm2(self.act(self.proj21(x)).transpose(1,-1)).transpose(1,-1)
+        x2 = self.proj22(x2)
+        x2 = rearrange(x2, 'b c (n1 p1) (n2 p2) -> b (c p1 p2) n1 n2', n1=7, n2=7, p1=16, p2=16)
+        #x = x1 + x2
+        x = x2
 
         if self.flatten:
             x = x.flatten(2).transpose(1, 2)  # BCHW -> BNC
