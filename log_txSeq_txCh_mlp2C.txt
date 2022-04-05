@@ -1,0 +1,765 @@
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torch/distributed/launch.py:186: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  FutureWarning,
+WARNING:torch.distributed.run:*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+Added key: store_based_barrier_key:1 to store for rank: 0
+Added key: store_based_barrier_key:1 to store for rank: 1
+Added key: store_based_barrier_key:1 to store for rank: 2
+Added key: store_based_barrier_key:1 to store for rank: 3
+Rank 3: Completed store-based barrier for key:store_based_barrier_key:1 with 4 nodes.
+Rank 1: Completed store-based barrier for key:store_based_barrier_key:1 with 4 nodes.
+Rank 0: Completed store-based barrier for key:store_based_barrier_key:1 with 4 nodes.
+Training in distributed mode with multiple processes, 1 GPU per process. Process 0, total 4.
+Training in distributed mode with multiple processes, 1 GPU per process. Process 3, total 4.
+Training in distributed mode with multiple processes, 1 GPU per process. Process 1, total 4.
+Rank 2: Completed store-based barrier for key:store_based_barrier_key:1 with 4 nodes.
+Training in distributed mode with multiple processes, 1 GPU per process. Process 2, total 4.
+Model vit_tiny_patch16_224 created, param count:5800936
+Data processing configuration for current model + dataset:
+	input_size: (3, 224, 224)
+	interpolation: bicubic
+	mean: (0.485, 0.456, 0.406)
+	std: (0.229, 0.224, 0.225)
+	crop_pct: 0.9
+Converted model to use Synchronized BatchNorm. WARNING: You may have issues if using zero initialized BN layers (enabled by default for ResNets) while sync-bn enabled.
+Using native Torch AMP. Training in mixed precision.
+Using native Torch DistributedDataParallel.
+Scheduled epochs: 310
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/transforms.py:283: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/transforms.py:283: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/transforms.py:283: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/transforms.py:283: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+/home/kkahatapitiy/anaconda3/envs/kkenv3/lib/python3.7/site-packages/torchvision/transforms/functional.py:401: UserWarning: Argument interpolation should be of type InterpolationMode instead of int. Please, use InterpolationMode enum.
+  "Argument interpolation should be of type InterpolationMode instead of int. "
+Train: 0 [   0/625 (  0%)]  Loss:  6.919708 (6.9197)  Time: 23.189s,   88.32/s  (23.189s,   88.32/s)  LR: 1.000e-06  Data: 17.983 (17.983)
+Reducer buckets have been rebuilt in this iteration.
+Reducer buckets have been rebuilt in this iteration.
+Reducer buckets have been rebuilt in this iteration.
+Reducer buckets have been rebuilt in this iteration.
+Train: 0 [  50/625 (  8%)]  Loss:  6.920714 (6.9202)  Time: 0.726s, 2819.37/s  (1.529s, 1339.35/s)  LR: 1.000e-06  Data: 0.049 (0.634)
+Train: 0 [ 100/625 ( 16%)]  Loss:  6.919591 (6.9200)  Time: 0.738s, 2776.85/s  (1.348s, 1519.41/s)  LR: 1.000e-06  Data: 0.047 (0.493)
+Train: 0 [ 150/625 ( 24%)]  Loss:  6.918730 (6.9197)  Time: 0.762s, 2688.22/s  (1.283s, 1595.69/s)  LR: 1.000e-06  Data: 0.047 (0.465)
+Train: 0 [ 200/625 ( 32%)]  Loss:  6.919356 (6.9196)  Time: 0.750s, 2731.05/s  (1.252s, 1635.74/s)  LR: 1.000e-06  Data: 0.043 (0.444)
+Train: 0 [ 250/625 ( 40%)]  Loss:  6.913490 (6.9186)  Time: 0.732s, 2797.10/s  (1.235s, 1658.72/s)  LR: 1.000e-06  Data: 0.050 (0.423)
+Train: 0 [ 300/625 ( 48%)]  Loss:  6.919937 (6.9188)  Time: 0.724s, 2827.14/s  (1.221s, 1677.36/s)  LR: 1.000e-06  Data: 0.048 (0.398)
+Train: 0 [ 350/625 ( 56%)]  Loss:  6.917473 (6.9186)  Time: 0.766s, 2674.60/s  (1.209s, 1693.79/s)  LR: 1.000e-06  Data: 0.073 (0.386)
+Train: 0 [ 400/625 ( 64%)]  Loss:  6.915089 (6.9182)  Time: 0.743s, 2755.38/s  (1.223s, 1674.64/s)  LR: 1.000e-06  Data: 0.056 (0.391)
+Train: 0 [ 450/625 ( 72%)]  Loss:  6.911643 (6.9176)  Time: 0.731s, 2801.83/s  (1.215s, 1685.84/s)  LR: 1.000e-06  Data: 0.047 (0.377)
+Train: 0 [ 500/625 ( 80%)]  Loss:  6.911324 (6.9170)  Time: 0.764s, 2682.21/s  (1.211s, 1691.14/s)  LR: 1.000e-06  Data: 0.047 (0.366)
+Train: 0 [ 550/625 ( 88%)]  Loss:  6.915340 (6.9169)  Time: 0.775s, 2641.17/s  (1.204s, 1701.00/s)  LR: 1.000e-06  Data: 0.046 (0.357)
+Train: 0 [ 600/625 ( 96%)]  Loss:  6.913946 (6.9166)  Time: 0.724s, 2828.70/s  (1.203s, 1703.10/s)  LR: 1.000e-06  Data: 0.046 (0.346)
+Train: 0 [ 624/625 (100%)]  Loss:  6.908426 (6.9161)  Time: 0.676s, 3031.64/s  (1.207s, 1697.26/s)  LR: 1.000e-06  Data: 0.000 (0.344)
+Test: [   0/24]  Time: 34.201 (34.201)  Loss:  6.8867 (6.8867)  Acc@1:  0.0488 ( 0.0488)  Acc@5:  0.8789 ( 0.8789)
+Test: [  24/24]  Time: 0.936 (1.911)  Loss:  6.8594 (6.9027)  Acc@1:  0.0000 ( 0.1360)  Acc@5:  0.0000 ( 0.6760)
+Test (EMA): [   0/24]  Time: 20.092 (20.092)  Loss:  6.9258 (6.9258)  Acc@1:  0.0000 ( 0.0000)  Acc@5:  0.1465 ( 0.1465)
+Test (EMA): [  24/24]  Time: 0.088 (1.285)  Loss:  6.9023 (6.9203)  Acc@1:  0.0000 ( 0.0940)  Acc@5:  0.2358 ( 0.4560)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+
+Train: 1 [   0/625 (  0%)]  Loss:  6.908225 (6.9082)  Time: 0.846s, 2421.05/s  (0.846s, 2421.05/s)  LR: 1.009e-04  Data: 0.088 (0.088)
+Train: 1 [  50/625 (  8%)]  Loss:  6.891871 (6.9000)  Time: 0.757s, 2705.99/s  (0.743s, 2756.18/s)  LR: 1.009e-04  Data: 0.044 (0.048)
+Train: 1 [ 100/625 ( 16%)]  Loss:  6.865523 (6.8885)  Time: 0.742s, 2759.33/s  (0.928s, 2207.91/s)  LR: 1.009e-04  Data: 0.048 (0.135)
+Train: 1 [ 150/625 ( 24%)]  Loss:  6.842672 (6.8771)  Time: 3.055s,  670.45/s  (1.029s, 1990.95/s)  LR: 1.009e-04  Data: 1.214 (0.191)
+Train: 1 [ 200/625 ( 32%)]  Loss:  6.842744 (6.8702)  Time: 1.149s, 1783.06/s  (1.073s, 1909.43/s)  LR: 1.009e-04  Data: 0.047 (0.198)
+Train: 1 [ 250/625 ( 40%)]  Loss:  6.829765 (6.8635)  Time: 0.741s, 2765.47/s  (1.092s, 1875.53/s)  LR: 1.009e-04  Data: 0.064 (0.192)
+Train: 1 [ 300/625 ( 48%)]  Loss:  6.746562 (6.8468)  Time: 0.929s, 2203.61/s  (1.106s, 1852.30/s)  LR: 1.009e-04  Data: 0.184 (0.192)
+Train: 1 [ 350/625 ( 56%)]  Loss:  6.741260 (6.8336)  Time: 0.765s, 2677.44/s  (1.118s, 1832.47/s)  LR: 1.009e-04  Data: 0.045 (0.194)
+Train: 1 [ 400/625 ( 64%)]  Loss:  6.777521 (6.8273)  Time: 0.721s, 2840.85/s  (1.125s, 1821.18/s)  LR: 1.009e-04  Data: 0.042 (0.188)
+Train: 1 [ 450/625 ( 72%)]  Loss:  6.701405 (6.8148)  Time: 0.743s, 2755.71/s  (1.130s, 1812.88/s)  LR: 1.009e-04  Data: 0.047 (0.189)
+Train: 1 [ 500/625 ( 80%)]  Loss:  6.739322 (6.8079)  Time: 0.747s, 2741.93/s  (1.137s, 1801.57/s)  LR: 1.009e-04  Data: 0.047 (0.191)
+Train: 1 [ 550/625 ( 88%)]  Loss:  6.707819 (6.7996)  Time: 4.018s,  509.71/s  (1.144s, 1790.08/s)  LR: 1.009e-04  Data: 1.834 (0.192)
+Train: 1 [ 600/625 ( 96%)]  Loss:  6.675201 (6.7900)  Time: 0.750s, 2731.87/s  (1.148s, 1784.53/s)  LR: 1.009e-04  Data: 0.046 (0.187)
+Train: 1 [ 624/625 (100%)]  Loss:  6.715010 (6.7846)  Time: 0.691s, 2962.54/s  (1.147s, 1785.85/s)  LR: 1.009e-04  Data: 0.000 (0.182)
+Test: [   0/24]  Time: 36.460 (36.460)  Loss:  6.1484 (6.1484)  Acc@1:  1.5137 ( 1.5137)  Acc@5:  8.7402 ( 8.7402)
+Test: [  24/24]  Time: 0.088 (2.143)  Loss:  5.6289 (6.2929)  Acc@1: 19.4575 ( 2.4380)  Acc@5: 29.5991 ( 7.8460)
+Test (EMA): [   0/24]  Time: 19.682 (19.682)  Loss:  6.9219 (6.9219)  Acc@1:  0.0000 ( 0.0000)  Acc@5:  0.1953 ( 0.1953)
+Test (EMA): [  24/24]  Time: 0.088 (1.294)  Loss:  6.8945 (6.9182)  Acc@1:  0.1179 ( 0.0920)  Acc@5:  0.5896 ( 0.4380)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+
+Train: 2 [   0/625 (  0%)]  Loss:  6.641677 (6.6417)  Time: 0.732s, 2798.28/s  (0.732s, 2798.28/s)  LR: 2.009e-04  Data: 0.069 (0.069)
+Train: 2 [  50/625 (  8%)]  Loss:  6.677382 (6.6595)  Time: 0.751s, 2728.60/s  (0.740s, 2766.26/s)  LR: 2.009e-04  Data: 0.059 (0.050)
+Train: 2 [ 100/625 ( 16%)]  Loss:  6.587213 (6.6354)  Time: 2.346s,  872.86/s  (0.928s, 2206.26/s)  LR: 2.009e-04  Data: 0.371 (0.114)
+Train: 2 [ 150/625 ( 24%)]  Loss:  6.593321 (6.6249)  Time: 0.746s, 2746.94/s  (1.020s, 2007.20/s)  LR: 2.009e-04  Data: 0.053 (0.175)
+Train: 2 [ 200/625 ( 32%)]  Loss:  6.578650 (6.6156)  Time: 1.355s, 1511.27/s  (1.068s, 1917.50/s)  LR: 2.009e-04  Data: 0.044 (0.212)
+Train: 2 [ 250/625 ( 40%)]  Loss:  6.566479 (6.6075)  Time: 0.732s, 2796.52/s  (1.089s, 1880.90/s)  LR: 2.009e-04  Data: 0.049 (0.242)
+Train: 2 [ 300/625 ( 48%)]  Loss:  6.598728 (6.6062)  Time: 0.748s, 2737.27/s  (1.107s, 1850.82/s)  LR: 2.009e-04  Data: 0.053 (0.280)
+Train: 2 [ 350/625 ( 56%)]  Loss:  6.613559 (6.6071)  Time: 0.768s, 2666.80/s  (1.116s, 1834.41/s)  LR: 2.009e-04  Data: 0.046 (0.303)
+Train: 2 [ 400/625 ( 64%)]  Loss:  6.529999 (6.5986)  Time: 0.747s, 2740.96/s  (1.124s, 1822.18/s)  LR: 2.009e-04  Data: 0.052 (0.318)
+Train: 2 [ 450/625 ( 72%)]  Loss:  6.663164 (6.6050)  Time: 0.733s, 2792.39/s  (1.131s, 1810.94/s)  LR: 2.009e-04  Data: 0.051 (0.338)
+Train: 2 [ 500/625 ( 80%)]  Loss:  6.589132 (6.6036)  Time: 2.511s,  815.71/s  (1.138s, 1799.97/s)  LR: 2.009e-04  Data: 1.835 (0.355)
+Train: 2 [ 550/625 ( 88%)]  Loss:  6.380173 (6.5850)  Time: 0.754s, 2717.25/s  (1.146s, 1787.83/s)  LR: 2.009e-04  Data: 0.047 (0.368)
+Train: 2 [ 600/625 ( 96%)]  Loss:  6.516030 (6.5797)  Time: 0.775s, 2641.74/s  (1.152s, 1778.30/s)  LR: 2.009e-04  Data: 0.050 (0.375)
+Train: 2 [ 624/625 (100%)]  Loss:  6.536792 (6.5766)  Time: 0.677s, 3023.51/s  (1.153s, 1776.61/s)  LR: 2.009e-04  Data: 0.000 (0.375)
+Test: [   0/24]  Time: 36.155 (36.155)  Loss:  5.4297 (5.4297)  Acc@1:  8.5938 ( 8.5938)  Acc@5: 22.0215 (22.0215)
+Test: [  24/24]  Time: 0.088 (2.095)  Loss:  4.8984 (5.6928)  Acc@1: 23.5849 ( 6.1700)  Acc@5: 36.6745 (17.0960)
+Test (EMA): [   0/24]  Time: 19.945 (19.945)  Loss:  6.9141 (6.9141)  Acc@1:  0.0000 ( 0.0000)  Acc@5:  0.1953 ( 0.1953)
+Test (EMA): [  24/24]  Time: 0.088 (1.276)  Loss:  6.8867 (6.9152)  Acc@1:  0.1179 ( 0.0840)  Acc@5:  0.4717 ( 0.4620)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 3 [   0/625 (  0%)]  Loss:  6.505897 (6.5059)  Time: 1.861s, 1100.76/s  (1.861s, 1100.76/s)  LR: 3.008e-04  Data: 0.088 (0.088)
+Train: 3 [  50/625 (  8%)]  Loss:  6.520000 (6.5129)  Time: 0.773s, 2648.08/s  (0.773s, 2650.32/s)  LR: 3.008e-04  Data: 0.048 (0.055)
+Train: 3 [ 100/625 ( 16%)]  Loss:  6.341832 (6.4559)  Time: 0.725s, 2823.47/s  (0.950s, 2155.35/s)  LR: 3.008e-04  Data: 0.049 (0.097)
+Train: 3 [ 150/625 ( 24%)]  Loss:  6.423871 (6.4479)  Time: 2.892s,  708.20/s  (1.039s, 1971.33/s)  LR: 3.008e-04  Data: 0.049 (0.103)
+Train: 3 [ 200/625 ( 32%)]  Loss:  6.525191 (6.4634)  Time: 2.771s,  739.11/s  (1.084s, 1888.68/s)  LR: 3.008e-04  Data: 0.044 (0.103)
+Train: 3 [ 250/625 ( 40%)]  Loss:  6.533739 (6.4751)  Time: 0.752s, 2725.21/s  (1.106s, 1850.97/s)  LR: 3.008e-04  Data: 0.061 (0.106)
+Train: 3 [ 300/625 ( 48%)]  Loss:  6.598446 (6.4927)  Time: 1.163s, 1761.23/s  (1.117s, 1833.35/s)  LR: 3.008e-04  Data: 0.486 (0.116)
+Train: 3 [ 350/625 ( 56%)]  Loss:  6.366339 (6.4769)  Time: 1.349s, 1518.64/s  (1.128s, 1815.68/s)  LR: 3.008e-04  Data: 0.046 (0.126)
+Train: 3 [ 400/625 ( 64%)]  Loss:  6.361176 (6.4641)  Time: 1.928s, 1062.51/s  (1.142s, 1792.79/s)  LR: 3.008e-04  Data: 0.045 (0.137)
+Train: 3 [ 450/625 ( 72%)]  Loss:  6.363309 (6.4540)  Time: 0.734s, 2791.85/s  (1.144s, 1790.16/s)  LR: 3.008e-04  Data: 0.057 (0.139)
+Train: 3 [ 500/625 ( 80%)]  Loss:  6.368096 (6.4462)  Time: 0.727s, 2815.47/s  (1.147s, 1785.43/s)  LR: 3.008e-04  Data: 0.048 (0.134)
+Train: 3 [ 550/625 ( 88%)]  Loss:  6.158998 (6.4222)  Time: 1.980s, 1034.41/s  (1.151s, 1778.97/s)  LR: 3.008e-04  Data: 0.045 (0.130)
+Train: 3 [ 600/625 ( 96%)]  Loss:  6.228455 (6.4073)  Time: 1.142s, 1793.93/s  (1.156s, 1772.16/s)  LR: 3.008e-04  Data: 0.046 (0.126)
+Train: 3 [ 624/625 (100%)]  Loss:  6.286146 (6.3987)  Time: 0.678s, 3022.07/s  (1.157s, 1769.83/s)  LR: 3.008e-04  Data: 0.000 (0.123)
+Test: [   0/24]  Time: 36.895 (36.895)  Loss:  4.9297 (4.9297)  Acc@1: 13.1836 (13.1836)  Acc@5: 30.7129 (30.7129)
+Test: [  24/24]  Time: 0.088 (2.130)  Loss:  4.2656 (5.2384)  Acc@1: 31.1321 (10.1440)  Acc@5: 48.5849 (25.0460)
+Test (EMA): [   0/24]  Time: 20.036 (20.036)  Loss:  6.9062 (6.9062)  Acc@1:  0.0000 ( 0.0000)  Acc@5:  0.4395 ( 0.4395)
+Test (EMA): [  24/24]  Time: 0.088 (1.277)  Loss:  6.8750 (6.9108)  Acc@1:  0.1179 ( 0.0880)  Acc@5:  1.1792 ( 0.5340)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 4 [   0/625 (  0%)]  Loss:  6.434309 (6.4343)  Time: 0.742s, 2759.56/s  (0.742s, 2759.56/s)  LR: 4.007e-04  Data: 0.079 (0.079)
+Train: 4 [  50/625 (  8%)]  Loss:  6.253248 (6.3438)  Time: 0.731s, 2801.74/s  (0.742s, 2761.52/s)  LR: 4.007e-04  Data: 0.052 (0.050)
+Train: 4 [ 100/625 ( 16%)]  Loss:  6.297876 (6.3285)  Time: 1.388s, 1475.42/s  (0.940s, 2178.00/s)  LR: 4.007e-04  Data: 0.056 (0.086)
+Train: 4 [ 150/625 ( 24%)]  Loss:  6.246713 (6.3080)  Time: 0.740s, 2766.67/s  (1.026s, 1995.68/s)  LR: 4.007e-04  Data: 0.052 (0.088)
+Train: 4 [ 200/625 ( 32%)]  Loss:  6.288727 (6.3042)  Time: 0.738s, 2776.50/s  (1.068s, 1916.87/s)  LR: 4.007e-04  Data: 0.056 (0.110)
+Train: 4 [ 250/625 ( 40%)]  Loss:  6.407418 (6.3214)  Time: 0.770s, 2660.29/s  (1.095s, 1871.08/s)  LR: 4.007e-04  Data: 0.043 (0.154)
+Train: 4 [ 300/625 ( 48%)]  Loss:  6.177618 (6.3008)  Time: 1.020s, 2007.43/s  (1.108s, 1848.89/s)  LR: 4.007e-04  Data: 0.047 (0.179)
+Train: 4 [ 350/625 ( 56%)]  Loss:  6.014981 (6.2651)  Time: 1.159s, 1767.66/s  (1.118s, 1832.52/s)  LR: 4.007e-04  Data: 0.483 (0.187)
+Train: 4 [ 400/625 ( 64%)]  Loss:  6.105122 (6.2473)  Time: 1.052s, 1947.65/s  (1.124s, 1822.78/s)  LR: 4.007e-04  Data: 0.375 (0.187)
+Train: 4 [ 450/625 ( 72%)]  Loss:  5.932719 (6.2159)  Time: 0.734s, 2791.21/s  (1.129s, 1813.61/s)  LR: 4.007e-04  Data: 0.049 (0.186)
+Train: 4 [ 500/625 ( 80%)]  Loss:  6.237851 (6.2179)  Time: 1.352s, 1515.19/s  (1.137s, 1801.22/s)  LR: 4.007e-04  Data: 0.048 (0.187)
+Train: 4 [ 550/625 ( 88%)]  Loss:  6.113794 (6.2092)  Time: 0.781s, 2622.82/s  (1.147s, 1785.80/s)  LR: 4.007e-04  Data: 0.049 (0.180)
+Train: 4 [ 600/625 ( 96%)]  Loss:  6.037480 (6.1960)  Time: 0.729s, 2808.20/s  (1.149s, 1781.66/s)  LR: 4.007e-04  Data: 0.048 (0.172)
+Train: 4 [ 624/625 (100%)]  Loss:  6.037687 (6.1847)  Time: 0.673s, 3041.91/s  (1.148s, 1783.51/s)  LR: 4.007e-04  Data: 0.000 (0.169)
+Test: [   0/24]  Time: 36.667 (36.667)  Loss:  4.4805 (4.4805)  Acc@1: 18.0176 (18.0176)  Acc@5: 40.0391 (40.0391)
+Test: [  24/24]  Time: 0.088 (2.152)  Loss:  3.6523 (4.8138)  Acc@1: 38.9151 (14.6740)  Acc@5: 59.3160 (33.0460)
+Test (EMA): [   0/24]  Time: 19.954 (19.954)  Loss:  6.8984 (6.8984)  Acc@1:  0.0000 ( 0.0000)  Acc@5:  0.4395 ( 0.4395)
+Test (EMA): [  24/24]  Time: 0.088 (1.270)  Loss:  6.8633 (6.9060)  Acc@1:  0.3538 ( 0.1020)  Acc@5:  2.1226 ( 0.5640)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 5 [   0/625 (  0%)]  Loss:  5.996307 (5.9963)  Time: 0.745s, 2748.73/s  (0.745s, 2748.73/s)  LR: 5.007e-04  Data: 0.083 (0.083)
+Train: 5 [  50/625 (  8%)]  Loss:  6.178376 (6.0873)  Time: 0.751s, 2727.57/s  (0.743s, 2755.71/s)  LR: 5.007e-04  Data: 0.047 (0.050)
+Train: 5 [ 100/625 ( 16%)]  Loss:  5.876587 (6.0171)  Time: 1.720s, 1190.67/s  (0.933s, 2195.64/s)  LR: 5.007e-04  Data: 1.045 (0.126)
+Train: 5 [ 150/625 ( 24%)]  Loss:  6.122576 (6.0435)  Time: 3.126s,  655.13/s  (1.034s, 1980.08/s)  LR: 5.007e-04  Data: 0.956 (0.133)
+Train: 5 [ 200/625 ( 32%)]  Loss:  6.255195 (6.0858)  Time: 0.738s, 2774.51/s  (1.069s, 1915.23/s)  LR: 5.007e-04  Data: 0.049 (0.164)
+Train: 5 [ 250/625 ( 40%)]  Loss:  5.962441 (6.0652)  Time: 3.087s,  663.47/s  (1.101s, 1859.94/s)  LR: 5.007e-04  Data: 2.145 (0.183)
+Train: 5 [ 300/625 ( 48%)]  Loss:  6.116006 (6.0725)  Time: 2.894s,  707.65/s  (1.119s, 1830.89/s)  LR: 5.007e-04  Data: 0.051 (0.174)
+Train: 5 [ 350/625 ( 56%)]  Loss:  6.034519 (6.0678)  Time: 0.723s, 2830.76/s  (1.126s, 1818.50/s)  LR: 5.007e-04  Data: 0.046 (0.171)
+Train: 5 [ 400/625 ( 64%)]  Loss:  6.000563 (6.0603)  Time: 0.723s, 2831.50/s  (1.132s, 1809.47/s)  LR: 5.007e-04  Data: 0.049 (0.173)
+Train: 5 [ 450/625 ( 72%)]  Loss:  6.078591 (6.0621)  Time: 0.743s, 2756.90/s  (1.143s, 1791.53/s)  LR: 5.007e-04  Data: 0.045 (0.172)
+Train: 5 [ 500/625 ( 80%)]  Loss:  5.934258 (6.0505)  Time: 0.747s, 2741.31/s  (1.148s, 1784.14/s)  LR: 5.007e-04  Data: 0.046 (0.181)
+Train: 5 [ 550/625 ( 88%)]  Loss:  5.859445 (6.0346)  Time: 0.753s, 2721.21/s  (1.151s, 1779.43/s)  LR: 5.007e-04  Data: 0.062 (0.183)
+Train: 5 [ 600/625 ( 96%)]  Loss:  5.910126 (6.0250)  Time: 1.891s, 1083.14/s  (1.157s, 1770.76/s)  LR: 5.007e-04  Data: 0.050 (0.185)
+Train: 5 [ 624/625 (100%)]  Loss:  5.762438 (6.0062)  Time: 0.681s, 3009.16/s  (1.156s, 1771.21/s)  LR: 5.007e-04  Data: 0.000 (0.186)
+Test: [   0/24]  Time: 36.730 (36.730)  Loss:  4.0391 (4.0391)  Acc@1: 24.1699 (24.1699)  Acc@5: 49.9512 (49.9512)
+Test: [  24/24]  Time: 0.088 (2.124)  Loss:  3.3633 (4.4797)  Acc@1: 42.5708 (18.1200)  Acc@5: 62.1462 (38.3380)
+Test (EMA): [   0/24]  Time: 20.145 (20.145)  Loss:  6.8789 (6.8789)  Acc@1:  0.1465 ( 0.1465)  Acc@5:  0.8789 ( 0.8789)
+Test (EMA): [  24/24]  Time: 0.088 (1.292)  Loss:  6.8477 (6.8998)  Acc@1:  0.5896 ( 0.1300)  Acc@5:  2.7123 ( 0.6720)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 6 [   0/625 (  0%)]  Loss:  6.066844 (6.0668)  Time: 1.568s, 1306.13/s  (1.568s, 1306.13/s)  LR: 6.006e-04  Data: 0.102 (0.102)
+Train: 6 [  50/625 (  8%)]  Loss:  5.915792 (5.9913)  Time: 0.741s, 2764.32/s  (0.761s, 2691.87/s)  LR: 6.006e-04  Data: 0.047 (0.051)
+Train: 6 [ 100/625 ( 16%)]  Loss:  6.257629 (6.0801)  Time: 0.726s, 2820.15/s  (0.938s, 2182.52/s)  LR: 6.006e-04  Data: 0.047 (0.081)
+Train: 6 [ 150/625 ( 24%)]  Loss:  6.155628 (6.0990)  Time: 2.577s,  794.83/s  (1.031s, 1986.71/s)  LR: 6.006e-04  Data: 0.051 (0.108)
+Train: 6 [ 200/625 ( 32%)]  Loss:  5.897933 (6.0588)  Time: 0.735s, 2787.00/s  (1.073s, 1908.81/s)  LR: 6.006e-04  Data: 0.058 (0.102)
+Train: 6 [ 250/625 ( 40%)]  Loss:  6.010716 (6.0508)  Time: 0.731s, 2800.75/s  (1.107s, 1849.72/s)  LR: 6.006e-04  Data: 0.053 (0.106)
+Train: 6 [ 300/625 ( 48%)]  Loss:  6.183496 (6.0697)  Time: 0.732s, 2796.68/s  (1.121s, 1826.90/s)  LR: 6.006e-04  Data: 0.056 (0.118)
+Train: 6 [ 350/625 ( 56%)]  Loss:  5.992032 (6.0600)  Time: 0.734s, 2789.17/s  (1.130s, 1811.64/s)  LR: 6.006e-04  Data: 0.058 (0.120)
+Train: 6 [ 400/625 ( 64%)]  Loss:  5.997943 (6.0531)  Time: 0.795s, 2576.69/s  (1.136s, 1803.33/s)  LR: 6.006e-04  Data: 0.043 (0.126)
+Train: 6 [ 450/625 ( 72%)]  Loss:  5.490722 (5.9969)  Time: 1.215s, 1686.23/s  (1.141s, 1795.04/s)  LR: 6.006e-04  Data: 0.050 (0.138)
+Train: 6 [ 500/625 ( 80%)]  Loss:  6.151299 (6.0109)  Time: 0.763s, 2684.62/s  (1.149s, 1782.93/s)  LR: 6.006e-04  Data: 0.046 (0.147)
+Train: 6 [ 550/625 ( 88%)]  Loss:  5.459078 (5.9649)  Time: 2.708s,  756.19/s  (1.154s, 1774.29/s)  LR: 6.006e-04  Data: 0.054 (0.144)
+Train: 6 [ 600/625 ( 96%)]  Loss:  5.655621 (5.9411)  Time: 0.764s, 2680.43/s  (1.158s, 1767.86/s)  LR: 6.006e-04  Data: 0.050 (0.139)
+Train: 6 [ 624/625 (100%)]  Loss:  5.877361 (5.9366)  Time: 0.694s, 2949.73/s  (1.160s, 1765.59/s)  LR: 6.006e-04  Data: 0.000 (0.137)
+Test: [   0/24]  Time: 35.088 (35.088)  Loss:  3.6191 (3.6191)  Acc@1: 29.3945 (29.3945)  Acc@5: 55.9082 (55.9082)
+Test: [  24/24]  Time: 0.088 (2.109)  Loss:  3.1504 (4.1985)  Acc@1: 45.9906 (21.5080)  Acc@5: 62.2642 (43.2620)
+Test (EMA): [   0/24]  Time: 19.931 (19.931)  Loss:  6.8672 (6.8672)  Acc@1:  0.1465 ( 0.1465)  Acc@5:  0.9277 ( 0.9277)
+Test (EMA): [  24/24]  Time: 0.088 (1.274)  Loss:  6.8281 (6.8923)  Acc@1:  1.1792 ( 0.1580)  Acc@5:  3.4198 ( 0.7860)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 7 [   0/625 (  0%)]  Loss:  5.764531 (5.7645)  Time: 0.736s, 2784.45/s  (0.736s, 2784.45/s)  LR: 7.005e-04  Data: 0.072 (0.072)
+Train: 7 [  50/625 (  8%)]  Loss:  6.204473 (5.9845)  Time: 0.761s, 2689.73/s  (0.739s, 2770.47/s)  LR: 7.005e-04  Data: 0.059 (0.050)
+Train: 7 [ 100/625 ( 16%)]  Loss:  5.959453 (5.9762)  Time: 0.745s, 2748.75/s  (0.952s, 2151.99/s)  LR: 7.005e-04  Data: 0.047 (0.152)
+Train: 7 [ 150/625 ( 24%)]  Loss:  5.460052 (5.8471)  Time: 2.291s,  893.96/s  (1.057s, 1937.60/s)  LR: 7.005e-04  Data: 0.047 (0.204)
+Train: 7 [ 200/625 ( 32%)]  Loss:  5.996245 (5.8770)  Time: 1.734s, 1181.42/s  (1.103s, 1856.15/s)  LR: 7.005e-04  Data: 0.062 (0.191)
+Train: 7 [ 250/625 ( 40%)]  Loss:  5.748601 (5.8556)  Time: 0.748s, 2737.86/s  (1.126s, 1819.03/s)  LR: 7.005e-04  Data: 0.049 (0.191)
+Train: 7 [ 300/625 ( 48%)]  Loss:  5.924100 (5.8654)  Time: 2.743s,  746.52/s  (1.152s, 1777.88/s)  LR: 7.005e-04  Data: 2.066 (0.200)
+Train: 7 [ 350/625 ( 56%)]  Loss:  5.842339 (5.8625)  Time: 0.728s, 2812.98/s  (1.162s, 1763.23/s)  LR: 7.005e-04  Data: 0.046 (0.201)
+Train: 7 [ 400/625 ( 64%)]  Loss:  5.714065 (5.8460)  Time: 0.746s, 2745.84/s  (1.166s, 1756.53/s)  LR: 7.005e-04  Data: 0.048 (0.198)
+Train: 7 [ 450/625 ( 72%)]  Loss:  5.787623 (5.8401)  Time: 0.736s, 2781.17/s  (1.171s, 1748.30/s)  LR: 7.005e-04  Data: 0.051 (0.192)
+Train: 7 [ 500/625 ( 80%)]  Loss:  5.820637 (5.8384)  Time: 0.729s, 2809.52/s  (1.176s, 1742.17/s)  LR: 7.005e-04  Data: 0.049 (0.186)
+Train: 7 [ 550/625 ( 88%)]  Loss:  5.770491 (5.8327)  Time: 2.281s,  897.94/s  (1.184s, 1729.30/s)  LR: 7.005e-04  Data: 0.047 (0.181)
+Train: 7 [ 600/625 ( 96%)]  Loss:  5.695802 (5.8222)  Time: 0.751s, 2728.68/s  (1.187s, 1724.87/s)  LR: 7.005e-04  Data: 0.047 (0.173)
+Train: 7 [ 624/625 (100%)]  Loss:  5.526319 (5.8011)  Time: 0.675s, 3034.28/s  (1.195s, 1713.87/s)  LR: 7.005e-04  Data: 0.000 (0.169)
+Test: [   0/24]  Time: 35.377 (35.377)  Loss:  3.4023 (3.4023)  Acc@1: 32.7637 (32.7637)  Acc@5: 60.0098 (60.0098)
+Test: [  24/24]  Time: 0.088 (2.054)  Loss:  2.4805 (3.9467)  Acc@1: 55.7783 (24.6880)  Acc@5: 73.4670 (47.7660)
+Test (EMA): [   0/24]  Time: 21.223 (21.223)  Loss:  6.8555 (6.8555)  Acc@1:  0.0977 ( 0.0977)  Acc@5:  1.5137 ( 1.5137)
+Test (EMA): [  24/24]  Time: 0.088 (1.309)  Loss:  6.8047 (6.8828)  Acc@1:  1.1792 ( 0.1940)  Acc@5:  4.2453 ( 0.9280)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 8 [   0/625 (  0%)]  Loss:  5.608631 (5.6086)  Time: 1.005s, 2037.29/s  (1.005s, 2037.29/s)  LR: 8.005e-04  Data: 0.077 (0.077)
+Train: 8 [  50/625 (  8%)]  Loss:  5.595088 (5.6019)  Time: 0.760s, 2695.66/s  (0.744s, 2752.61/s)  LR: 8.005e-04  Data: 0.052 (0.051)
+Train: 8 [ 100/625 ( 16%)]  Loss:  5.946841 (5.7169)  Time: 0.753s, 2718.45/s  (0.950s, 2156.63/s)  LR: 8.005e-04  Data: 0.051 (0.138)
+Train: 8 [ 150/625 ( 24%)]  Loss:  5.812073 (5.7407)  Time: 2.556s,  801.12/s  (1.051s, 1948.65/s)  LR: 8.005e-04  Data: 0.066 (0.190)
+Train: 8 [ 200/625 ( 32%)]  Loss:  5.672539 (5.7270)  Time: 2.865s,  714.82/s  (1.098s, 1865.44/s)  LR: 8.005e-04  Data: 0.045 (0.193)
+Train: 8 [ 250/625 ( 40%)]  Loss:  5.308169 (5.6572)  Time: 0.748s, 2737.50/s  (1.120s, 1828.82/s)  LR: 8.005e-04  Data: 0.048 (0.214)
+Train: 8 [ 300/625 ( 48%)]  Loss:  5.952875 (5.6995)  Time: 0.746s, 2744.31/s  (1.134s, 1805.34/s)  LR: 8.005e-04  Data: 0.056 (0.229)
+Train: 8 [ 350/625 ( 56%)]  Loss:  5.484736 (5.6726)  Time: 2.116s,  967.82/s  (1.150s, 1780.37/s)  LR: 8.005e-04  Data: 0.044 (0.230)
+Train: 8 [ 400/625 ( 64%)]  Loss:  5.681602 (5.6736)  Time: 0.741s, 2762.92/s  (1.156s, 1771.24/s)  LR: 8.005e-04  Data: 0.046 (0.228)
+Train: 8 [ 450/625 ( 72%)]  Loss:  5.624421 (5.6687)  Time: 0.748s, 2739.20/s  (1.161s, 1763.94/s)  LR: 8.005e-04  Data: 0.052 (0.231)
+Train: 8 [ 500/625 ( 80%)]  Loss:  5.327657 (5.6377)  Time: 0.737s, 2779.46/s  (1.165s, 1757.28/s)  LR: 8.005e-04  Data: 0.054 (0.227)
+Train: 8 [ 550/625 ( 88%)]  Loss:  5.551990 (5.6306)  Time: 3.621s,  565.56/s  (1.174s, 1744.96/s)  LR: 8.005e-04  Data: 0.052 (0.225)
+Train: 8 [ 600/625 ( 96%)]  Loss:  5.635770 (5.6310)  Time: 0.744s, 2752.00/s  (1.179s, 1737.64/s)  LR: 8.005e-04  Data: 0.045 (0.227)
+Train: 8 [ 624/625 (100%)]  Loss:  5.485401 (5.6206)  Time: 0.706s, 2900.65/s  (1.182s, 1732.14/s)  LR: 8.005e-04  Data: 0.000 (0.232)
+Test: [   0/24]  Time: 34.059 (34.059)  Loss:  3.1699 (3.1699)  Acc@1: 35.2051 (35.2051)  Acc@5: 64.0137 (64.0137)
+Test: [  24/24]  Time: 0.088 (2.123)  Loss:  2.5566 (3.7505)  Acc@1: 54.4811 (27.0100)  Acc@5: 71.9340 (50.9460)
+Test (EMA): [   0/24]  Time: 20.463 (20.463)  Loss:  6.8359 (6.8359)  Acc@1:  0.0977 ( 0.0977)  Acc@5:  1.7090 ( 1.7090)
+Test (EMA): [  24/24]  Time: 0.088 (1.292)  Loss:  6.7695 (6.8687)  Acc@1:  1.7689 ( 0.2360)  Acc@5:  5.7783 ( 1.1660)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 9 [   0/625 (  0%)]  Loss:  5.143979 (5.1440)  Time: 0.805s, 2542.64/s  (0.805s, 2542.64/s)  LR: 9.004e-04  Data: 0.081 (0.081)
+Train: 9 [  50/625 (  8%)]  Loss:  5.982670 (5.5633)  Time: 0.724s, 2827.62/s  (0.744s, 2751.23/s)  LR: 9.004e-04  Data: 0.049 (0.050)
+Train: 9 [ 100/625 ( 16%)]  Loss:  5.625611 (5.5841)  Time: 1.590s, 1288.23/s  (0.947s, 2162.87/s)  LR: 9.004e-04  Data: 0.046 (0.076)
+Train: 9 [ 150/625 ( 24%)]  Loss:  5.591012 (5.5858)  Time: 1.335s, 1534.42/s  (1.038s, 1972.27/s)  LR: 9.004e-04  Data: 0.055 (0.092)
+Train: 9 [ 200/625 ( 32%)]  Loss:  5.518998 (5.5725)  Time: 0.976s, 2099.13/s  (1.091s, 1877.98/s)  LR: 9.004e-04  Data: 0.050 (0.122)
+Train: 9 [ 250/625 ( 40%)]  Loss:  6.024266 (5.6478)  Time: 0.749s, 2734.77/s  (1.115s, 1837.51/s)  LR: 9.004e-04  Data: 0.050 (0.161)
+Train: 9 [ 300/625 ( 48%)]  Loss:  5.757530 (5.6634)  Time: 2.387s,  858.07/s  (1.133s, 1808.34/s)  LR: 9.004e-04  Data: 0.047 (0.201)
+Train: 9 [ 350/625 ( 56%)]  Loss:  5.126313 (5.5963)  Time: 0.730s, 2804.43/s  (1.151s, 1779.66/s)  LR: 9.004e-04  Data: 0.052 (0.240)
+Train: 9 [ 400/625 ( 64%)]  Loss:  5.391096 (5.5735)  Time: 4.804s,  426.34/s  (1.164s, 1758.87/s)  LR: 9.004e-04  Data: 4.080 (0.265)
+Train: 9 [ 450/625 ( 72%)]  Loss:  5.522542 (5.5684)  Time: 0.733s, 2794.60/s  (1.168s, 1753.76/s)  LR: 9.004e-04  Data: 0.049 (0.277)
+Train: 9 [ 500/625 ( 80%)]  Loss:  5.371471 (5.5505)  Time: 0.728s, 2814.39/s  (1.173s, 1746.69/s)  LR: 9.004e-04  Data: 0.044 (0.285)
+Train: 9 [ 550/625 ( 88%)]  Loss:  5.916603 (5.5810)  Time: 0.736s, 2781.18/s  (1.176s, 1741.90/s)  LR: 9.004e-04  Data: 0.043 (0.286)
+Train: 9 [ 600/625 ( 96%)]  Loss:  6.031516 (5.6157)  Time: 1.033s, 1981.95/s  (1.179s, 1737.14/s)  LR: 9.004e-04  Data: 0.359 (0.284)
+Train: 9 [ 624/625 (100%)]  Loss:  5.630169 (5.6167)  Time: 0.689s, 2973.28/s  (1.185s, 1727.66/s)  LR: 9.004e-04  Data: 0.000 (0.287)
+Test: [   0/24]  Time: 33.348 (33.348)  Loss:  3.0469 (3.0469)  Acc@1: 39.4043 (39.4043)  Acc@5: 65.8691 (65.8691)
+Test: [  24/24]  Time: 0.088 (1.987)  Loss:  2.2012 (3.6558)  Acc@1: 57.4292 (28.4340)  Acc@5: 76.6509 (52.7440)
+Test (EMA): [   0/24]  Time: 20.329 (20.329)  Loss:  6.8203 (6.8203)  Acc@1:  0.2441 ( 0.2441)  Acc@5:  2.0020 ( 2.0020)
+Test (EMA): [  24/24]  Time: 0.088 (1.285)  Loss:  6.7305 (6.8509)  Acc@1:  2.3585 ( 0.2960)  Acc@5:  6.6038 ( 1.3600)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-2.pth.tar', 0.0839999999666214)
+
+Train: 10 [   0/625 (  0%)]  Loss:  5.864460 (5.8645)  Time: 2.085s,  982.36/s  (2.085s,  982.36/s)  LR: 1.000e-03  Data: 0.102 (0.102)
+Train: 10 [  50/625 (  8%)]  Loss:  5.642096 (5.7533)  Time: 0.739s, 2770.48/s  (0.767s, 2671.64/s)  LR: 1.000e-03  Data: 0.061 (0.049)
+Train: 10 [ 100/625 ( 16%)]  Loss:  5.305655 (5.6041)  Time: 0.767s, 2668.75/s  (0.954s, 2146.75/s)  LR: 1.000e-03  Data: 0.045 (0.143)
+Train: 10 [ 150/625 ( 24%)]  Loss:  5.987696 (5.7000)  Time: 3.190s,  642.07/s  (1.054s, 1942.31/s)  LR: 1.000e-03  Data: 2.514 (0.219)
+Train: 10 [ 200/625 ( 32%)]  Loss:  5.732003 (5.7064)  Time: 0.724s, 2827.92/s  (1.100s, 1861.99/s)  LR: 1.000e-03  Data: 0.048 (0.228)
+Train: 10 [ 250/625 ( 40%)]  Loss:  5.607963 (5.6900)  Time: 3.640s,  562.64/s  (1.130s, 1811.71/s)  LR: 1.000e-03  Data: 0.046 (0.234)
+Train: 10 [ 300/625 ( 48%)]  Loss:  5.692740 (5.6904)  Time: 0.743s, 2755.66/s  (1.143s, 1791.06/s)  LR: 1.000e-03  Data: 0.043 (0.240)
+Train: 10 [ 350/625 ( 56%)]  Loss:  5.672073 (5.6881)  Time: 0.727s, 2816.38/s  (1.158s, 1768.91/s)  LR: 1.000e-03  Data: 0.049 (0.251)
+Train: 10 [ 400/625 ( 64%)]  Loss:  5.484464 (5.6655)  Time: 0.732s, 2799.09/s  (1.165s, 1758.30/s)  LR: 1.000e-03  Data: 0.051 (0.255)
+Train: 10 [ 450/625 ( 72%)]  Loss:  5.458426 (5.6448)  Time: 0.988s, 2072.09/s  (1.170s, 1749.95/s)  LR: 1.000e-03  Data: 0.050 (0.252)
+Train: 10 [ 500/625 ( 80%)]  Loss:  5.646544 (5.6449)  Time: 0.729s, 2809.90/s  (1.175s, 1743.26/s)  LR: 1.000e-03  Data: 0.052 (0.249)
+Train: 10 [ 550/625 ( 88%)]  Loss:  5.574467 (5.6390)  Time: 2.642s,  775.29/s  (1.181s, 1734.80/s)  LR: 1.000e-03  Data: 1.966 (0.251)
+Train: 10 [ 600/625 ( 96%)]  Loss:  5.688236 (5.6428)  Time: 0.780s, 2626.75/s  (1.187s, 1724.65/s)  LR: 1.000e-03  Data: 0.048 (0.252)
+Train: 10 [ 624/625 (100%)]  Loss:  5.492749 (5.6321)  Time: 0.680s, 3012.44/s  (1.191s, 1720.02/s)  LR: 1.000e-03  Data: 0.000 (0.251)
+Test: [   0/24]  Time: 35.726 (35.726)  Loss:  2.9863 (2.9863)  Acc@1: 39.2090 (39.2090)  Acc@5: 66.8945 (66.8945)
+Test: [  24/24]  Time: 0.088 (2.035)  Loss:  2.2578 (3.6002)  Acc@1: 59.5519 (29.6420)  Acc@5: 75.8255 (54.0140)
+Test (EMA): [   0/24]  Time: 20.444 (20.444)  Loss:  6.8008 (6.8008)  Acc@1:  0.3418 ( 0.3418)  Acc@5:  2.4414 ( 2.4414)
+Test (EMA): [  24/24]  Time: 0.088 (1.381)  Loss:  6.6836 (6.8276)  Acc@1:  2.5943 ( 0.3640)  Acc@5:  8.3726 ( 1.6960)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-3.pth.tar', 0.0879999999666214)
+
+Train: 11 [   0/625 (  0%)]  Loss:  5.691024 (5.6910)  Time: 1.203s, 1702.39/s  (1.203s, 1702.39/s)  LR: 1.100e-03  Data: 0.327 (0.327)
+Train: 11 [  50/625 (  8%)]  Loss:  5.283757 (5.4874)  Time: 0.750s, 2730.87/s  (0.746s, 2746.54/s)  LR: 1.100e-03  Data: 0.048 (0.055)
+Train: 11 [ 100/625 ( 16%)]  Loss:  5.684646 (5.5531)  Time: 0.752s, 2722.99/s  (0.957s, 2139.83/s)  LR: 1.100e-03  Data: 0.048 (0.131)
+Train: 11 [ 150/625 ( 24%)]  Loss:  5.636661 (5.5740)  Time: 1.613s, 1269.81/s  (1.052s, 1947.33/s)  LR: 1.100e-03  Data: 0.923 (0.167)
+Train: 11 [ 200/625 ( 32%)]  Loss:  5.566380 (5.5725)  Time: 0.796s, 2572.36/s  (1.097s, 1867.52/s)  LR: 1.100e-03  Data: 0.046 (0.184)
+Train: 11 [ 250/625 ( 40%)]  Loss:  5.344019 (5.5344)  Time: 0.835s, 2452.56/s  (1.123s, 1823.13/s)  LR: 1.100e-03  Data: 0.048 (0.175)
+Train: 11 [ 300/625 ( 48%)]  Loss:  5.723228 (5.5614)  Time: 3.013s,  679.77/s  (1.147s, 1785.52/s)  LR: 1.100e-03  Data: 0.047 (0.166)
+Train: 11 [ 350/625 ( 56%)]  Loss:  5.733500 (5.5829)  Time: 1.783s, 1148.57/s  (1.159s, 1767.63/s)  LR: 1.100e-03  Data: 0.045 (0.150)
+Train: 11 [ 400/625 ( 64%)]  Loss:  5.691809 (5.5950)  Time: 0.765s, 2676.46/s  (1.166s, 1755.83/s)  LR: 1.100e-03  Data: 0.052 (0.137)
+Train: 11 [ 450/625 ( 72%)]  Loss:  5.200440 (5.5555)  Time: 0.730s, 2805.19/s  (1.166s, 1755.68/s)  LR: 1.100e-03  Data: 0.049 (0.130)
+Train: 11 [ 500/625 ( 80%)]  Loss:  5.700475 (5.5687)  Time: 0.746s, 2743.85/s  (1.175s, 1743.40/s)  LR: 1.100e-03  Data: 0.047 (0.128)
+Train: 11 [ 550/625 ( 88%)]  Loss:  5.197384 (5.5378)  Time: 0.919s, 2228.55/s  (1.176s, 1741.16/s)  LR: 1.100e-03  Data: 0.245 (0.123)
+Train: 11 [ 600/625 ( 96%)]  Loss:  5.220062 (5.5133)  Time: 0.741s, 2764.81/s  (1.182s, 1733.02/s)  LR: 1.100e-03  Data: 0.049 (0.125)
+Train: 11 [ 624/625 (100%)]  Loss:  5.335237 (5.5006)  Time: 0.692s, 2958.26/s  (1.190s, 1720.65/s)  LR: 1.100e-03  Data: 0.000 (0.124)
+Test: [   0/24]  Time: 33.620 (33.620)  Loss:  2.7773 (2.7773)  Acc@1: 42.5781 (42.5781)  Acc@5: 68.4570 (68.4570)
+Test: [  24/24]  Time: 0.088 (1.951)  Loss:  2.1250 (3.4415)  Acc@1: 60.2594 (31.2720)  Acc@5: 78.0660 (55.7960)
+Test (EMA): [   0/24]  Time: 20.038 (20.038)  Loss:  6.7578 (6.7578)  Acc@1:  0.3906 ( 0.3906)  Acc@5:  3.1250 ( 3.1250)
+Test (EMA): [  24/24]  Time: 0.088 (1.270)  Loss:  6.6172 (6.7935)  Acc@1:  3.3019 ( 0.5060)  Acc@5:  9.7877 ( 2.1680)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-1.pth.tar', 0.09199999996662139)
+
+Train: 12 [   0/625 (  0%)]  Loss:  5.516481 (5.5165)  Time: 0.752s, 2722.36/s  (0.752s, 2722.36/s)  LR: 1.200e-03  Data: 0.090 (0.090)
+Train: 12 [  50/625 (  8%)]  Loss:  5.551101 (5.5338)  Time: 0.735s, 2784.96/s  (0.742s, 2759.81/s)  LR: 1.200e-03  Data: 0.057 (0.051)
+Train: 12 [ 100/625 ( 16%)]  Loss:  5.406808 (5.4915)  Time: 1.251s, 1637.57/s  (0.944s, 2170.37/s)  LR: 1.200e-03  Data: 0.567 (0.155)
+Train: 12 [ 150/625 ( 24%)]  Loss:  5.617956 (5.5231)  Time: 1.674s, 1223.23/s  (1.035s, 1979.49/s)  LR: 1.200e-03  Data: 0.051 (0.194)
+Train: 12 [ 200/625 ( 32%)]  Loss:  5.640395 (5.5465)  Time: 3.304s,  619.92/s  (1.083s, 1891.63/s)  LR: 1.200e-03  Data: 2.172 (0.214)
+Train: 12 [ 250/625 ( 40%)]  Loss:  5.379806 (5.5188)  Time: 0.745s, 2749.62/s  (1.104s, 1855.22/s)  LR: 1.200e-03  Data: 0.047 (0.213)
+Train: 12 [ 300/625 ( 48%)]  Loss:  5.327124 (5.4914)  Time: 1.974s, 1037.69/s  (1.123s, 1824.01/s)  LR: 1.200e-03  Data: 0.053 (0.209)
+Train: 12 [ 350/625 ( 56%)]  Loss:  5.081417 (5.4401)  Time: 0.725s, 2824.09/s  (1.134s, 1806.38/s)  LR: 1.200e-03  Data: 0.049 (0.222)
+Train: 12 [ 400/625 ( 64%)]  Loss:  5.802259 (5.4804)  Time: 0.740s, 2767.78/s  (1.140s, 1797.04/s)  LR: 1.200e-03  Data: 0.048 (0.227)
+Train: 12 [ 450/625 ( 72%)]  Loss:  5.581573 (5.4905)  Time: 0.726s, 2822.73/s  (1.150s, 1781.07/s)  LR: 1.200e-03  Data: 0.048 (0.228)
+Train: 12 [ 500/625 ( 80%)]  Loss:  5.620275 (5.5023)  Time: 0.742s, 2761.73/s  (1.153s, 1775.68/s)  LR: 1.200e-03  Data: 0.065 (0.224)
+Train: 12 [ 550/625 ( 88%)]  Loss:  5.826678 (5.5293)  Time: 0.734s, 2790.84/s  (1.157s, 1769.36/s)  LR: 1.200e-03  Data: 0.043 (0.221)
+Train: 12 [ 600/625 ( 96%)]  Loss:  5.514495 (5.5282)  Time: 0.748s, 2739.29/s  (1.162s, 1762.51/s)  LR: 1.200e-03  Data: 0.052 (0.222)
+Train: 12 [ 624/625 (100%)]  Loss:  5.411254 (5.5198)  Time: 0.677s, 3024.64/s  (1.164s, 1759.60/s)  LR: 1.200e-03  Data: 0.000 (0.222)
+Test: [   0/24]  Time: 35.613 (35.613)  Loss:  2.8145 (2.8145)  Acc@1: 43.5547 (43.5547)  Acc@5: 68.9941 (68.9941)
+Test: [  24/24]  Time: 0.088 (2.184)  Loss:  2.1055 (3.4167)  Acc@1: 60.2594 (32.1780)  Acc@5: 78.7736 (57.2660)
+Test (EMA): [   0/24]  Time: 20.560 (20.560)  Loss:  6.7148 (6.7148)  Acc@1:  0.5859 ( 0.5859)  Acc@5:  4.2480 ( 4.2480)
+Test (EMA): [  24/24]  Time: 0.088 (1.293)  Loss:  6.5391 (6.7466)  Acc@1:  4.8349 ( 0.7320)  Acc@5: 12.7358 ( 2.9080)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-0.pth.tar', 0.094)
+
+Train: 13 [   0/625 (  0%)]  Loss:  5.408895 (5.4089)  Time: 1.220s, 1678.70/s  (1.220s, 1678.70/s)  LR: 1.300e-03  Data: 0.101 (0.101)
+Train: 13 [  50/625 (  8%)]  Loss:  5.935341 (5.6721)  Time: 0.748s, 2737.49/s  (0.755s, 2712.99/s)  LR: 1.300e-03  Data: 0.054 (0.049)
+Train: 13 [ 100/625 ( 16%)]  Loss:  5.689542 (5.6779)  Time: 1.023s, 2002.37/s  (0.939s, 2180.17/s)  LR: 1.300e-03  Data: 0.298 (0.158)
+Train: 13 [ 150/625 ( 24%)]  Loss:  5.836127 (5.7175)  Time: 0.729s, 2807.60/s  (1.021s, 2005.13/s)  LR: 1.300e-03  Data: 0.050 (0.199)
+Train: 13 [ 200/625 ( 32%)]  Loss:  5.379907 (5.6500)  Time: 2.314s,  885.23/s  (1.080s, 1896.41/s)  LR: 1.300e-03  Data: 1.639 (0.238)
+Train: 13 [ 250/625 ( 40%)]  Loss:  5.568574 (5.6364)  Time: 2.281s,  898.03/s  (1.109s, 1847.50/s)  LR: 1.300e-03  Data: 0.051 (0.247)
+Train: 13 [ 300/625 ( 48%)]  Loss:  4.951942 (5.5386)  Time: 0.734s, 2789.01/s  (1.125s, 1820.25/s)  LR: 1.300e-03  Data: 0.049 (0.251)
+Train: 13 [ 350/625 ( 56%)]  Loss:  5.489273 (5.5325)  Time: 0.877s, 2335.73/s  (1.137s, 1800.81/s)  LR: 1.300e-03  Data: 0.198 (0.247)
+Train: 13 [ 400/625 ( 64%)]  Loss:  5.560084 (5.5355)  Time: 0.753s, 2718.24/s  (1.143s, 1791.17/s)  LR: 1.300e-03  Data: 0.045 (0.247)
+Train: 13 [ 450/625 ( 72%)]  Loss:  5.572869 (5.5393)  Time: 0.730s, 2805.23/s  (1.151s, 1778.75/s)  LR: 1.300e-03  Data: 0.048 (0.238)
+Train: 13 [ 500/625 ( 80%)]  Loss:  5.559589 (5.5411)  Time: 0.758s, 2703.38/s  (1.154s, 1774.61/s)  LR: 1.300e-03  Data: 0.047 (0.225)
+Train: 13 [ 550/625 ( 88%)]  Loss:  5.631533 (5.5486)  Time: 2.915s,  702.60/s  (1.160s, 1765.81/s)  LR: 1.300e-03  Data: 0.048 (0.211)
+Train: 13 [ 600/625 ( 96%)]  Loss:  5.539630 (5.5479)  Time: 0.751s, 2728.02/s  (1.164s, 1759.68/s)  LR: 1.300e-03  Data: 0.049 (0.201)
+Train: 13 [ 624/625 (100%)]  Loss:  5.421657 (5.5389)  Time: 0.689s, 2971.95/s  (1.168s, 1754.10/s)  LR: 1.300e-03  Data: 0.000 (0.200)
+Test: [   0/24]  Time: 35.282 (35.282)  Loss:  2.6973 (2.6973)  Acc@1: 44.4824 (44.4824)  Acc@5: 70.7520 (70.7520)
+Test: [  24/24]  Time: 0.088 (2.074)  Loss:  1.9443 (3.2947)  Acc@1: 63.5613 (33.3200)  Acc@5: 79.7170 (58.5560)
+Test (EMA): [   0/24]  Time: 20.418 (20.418)  Loss:  6.6406 (6.6406)  Acc@1:  1.1230 ( 1.1230)  Acc@5:  5.4688 ( 5.4688)
+Test (EMA): [  24/24]  Time: 0.088 (1.271)  Loss:  6.4414 (6.6867)  Acc@1:  5.8962 ( 0.9980)  Acc@5: 14.8585 ( 3.7420)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-4.pth.tar', 0.1020000001525879)
+
+Train: 14 [   0/625 (  0%)]  Loss:  5.812316 (5.8123)  Time: 0.766s, 2672.07/s  (0.766s, 2672.07/s)  LR: 1.400e-03  Data: 0.082 (0.082)
+Train: 14 [  50/625 (  8%)]  Loss:  5.194053 (5.5032)  Time: 0.777s, 2636.56/s  (0.741s, 2764.22/s)  LR: 1.400e-03  Data: 0.065 (0.051)
+Train: 14 [ 100/625 ( 16%)]  Loss:  5.465343 (5.4906)  Time: 2.396s,  854.93/s  (0.948s, 2160.41/s)  LR: 1.400e-03  Data: 0.210 (0.137)
+Train: 14 [ 150/625 ( 24%)]  Loss:  5.214643 (5.4216)  Time: 2.240s,  914.43/s  (1.039s, 1971.74/s)  LR: 1.400e-03  Data: 1.562 (0.184)
+Train: 14 [ 200/625 ( 32%)]  Loss:  5.430013 (5.4233)  Time: 0.755s, 2712.20/s  (1.078s, 1899.80/s)  LR: 1.400e-03  Data: 0.077 (0.190)
+Train: 14 [ 250/625 ( 40%)]  Loss:  5.155765 (5.3787)  Time: 1.211s, 1690.77/s  (1.103s, 1856.58/s)  LR: 1.400e-03  Data: 0.052 (0.206)
+Train: 14 [ 300/625 ( 48%)]  Loss:  5.490401 (5.3946)  Time: 0.742s, 2759.72/s  (1.120s, 1828.80/s)  LR: 1.400e-03  Data: 0.048 (0.217)
+Train: 14 [ 350/625 ( 56%)]  Loss:  5.716912 (5.4349)  Time: 3.424s,  598.11/s  (1.140s, 1795.92/s)  LR: 1.400e-03  Data: 0.047 (0.201)
+Train: 14 [ 400/625 ( 64%)]  Loss:  5.224401 (5.4115)  Time: 0.747s, 2740.48/s  (1.143s, 1791.56/s)  LR: 1.400e-03  Data: 0.047 (0.186)
+Train: 14 [ 450/625 ( 72%)]  Loss:  5.344313 (5.4048)  Time: 0.724s, 2828.42/s  (1.145s, 1788.25/s)  LR: 1.400e-03  Data: 0.050 (0.178)
+Train: 14 [ 500/625 ( 80%)]  Loss:  5.135725 (5.3804)  Time: 0.733s, 2795.83/s  (1.148s, 1784.50/s)  LR: 1.400e-03  Data: 0.046 (0.177)
+Train: 14 [ 550/625 ( 88%)]  Loss:  5.235903 (5.3683)  Time: 1.203s, 1702.77/s  (1.152s, 1777.17/s)  LR: 1.400e-03  Data: 0.527 (0.177)
+Train: 14 [ 600/625 ( 96%)]  Loss:  5.207561 (5.3559)  Time: 0.885s, 2313.15/s  (1.156s, 1772.04/s)  LR: 1.400e-03  Data: 0.208 (0.174)
+Train: 14 [ 624/625 (100%)]  Loss:  4.846762 (5.3196)  Time: 0.676s, 3029.37/s  (1.160s, 1765.19/s)  LR: 1.400e-03  Data: 0.000 (0.175)
+Test: [   0/24]  Time: 35.953 (35.953)  Loss:  2.6973 (2.6973)  Acc@1: 43.7012 (43.7012)  Acc@5: 70.1660 (70.1660)
+Test: [  24/24]  Time: 0.088 (2.089)  Loss:  2.0156 (3.2883)  Acc@1: 59.5519 (33.0600)  Acc@5: 78.1840 (58.7200)
+Test (EMA): [   0/24]  Time: 20.947 (20.947)  Loss:  6.5430 (6.5430)  Acc@1:  1.9043 ( 1.9043)  Acc@5:  7.1289 ( 7.1289)
+Test (EMA): [  24/24]  Time: 0.088 (1.269)  Loss:  6.3242 (6.6122)  Acc@1:  7.5472 ( 1.3960)  Acc@5: 15.6840 ( 4.9100)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-5.pth.tar', 0.1300000005912781)
+
+Train: 15 [   0/625 (  0%)]  Loss:  5.212573 (5.2126)  Time: 1.513s, 1353.52/s  (1.513s, 1353.52/s)  LR: 1.491e-03  Data: 0.548 (0.548)
+Train: 15 [  50/625 (  8%)]  Loss:  5.394838 (5.3037)  Time: 0.734s, 2791.78/s  (0.752s, 2721.86/s)  LR: 1.491e-03  Data: 0.050 (0.058)
+Train: 15 [ 100/625 ( 16%)]  Loss:  4.983764 (5.1971)  Time: 0.740s, 2767.68/s  (0.945s, 2167.93/s)  LR: 1.491e-03  Data: 0.059 (0.166)
+Train: 15 [ 150/625 ( 24%)]  Loss:  5.512069 (5.2758)  Time: 0.738s, 2773.91/s  (1.058s, 1935.12/s)  LR: 1.491e-03  Data: 0.048 (0.238)
+Train: 15 [ 200/625 ( 32%)]  Loss:  5.562303 (5.3331)  Time: 0.746s, 2746.05/s  (1.092s, 1875.43/s)  LR: 1.491e-03  Data: 0.055 (0.262)
+Train: 15 [ 250/625 ( 40%)]  Loss:  5.261538 (5.3212)  Time: 1.494s, 1370.73/s  (1.122s, 1825.25/s)  LR: 1.491e-03  Data: 0.051 (0.283)
+Train: 15 [ 300/625 ( 48%)]  Loss:  5.638753 (5.3665)  Time: 0.744s, 2752.99/s  (1.139s, 1798.80/s)  LR: 1.491e-03  Data: 0.048 (0.294)
+Train: 15 [ 350/625 ( 56%)]  Loss:  5.887538 (5.4317)  Time: 0.737s, 2777.94/s  (1.148s, 1783.71/s)  LR: 1.491e-03  Data: 0.046 (0.310)
+Train: 15 [ 400/625 ( 64%)]  Loss:  5.355142 (5.4232)  Time: 0.731s, 2801.22/s  (1.157s, 1770.49/s)  LR: 1.491e-03  Data: 0.053 (0.322)
+Train: 15 [ 450/625 ( 72%)]  Loss:  5.570663 (5.4379)  Time: 0.734s, 2791.28/s  (1.161s, 1764.06/s)  LR: 1.491e-03  Data: 0.047 (0.326)
+Train: 15 [ 500/625 ( 80%)]  Loss:  5.083201 (5.4057)  Time: 0.740s, 2765.91/s  (1.167s, 1755.63/s)  LR: 1.491e-03  Data: 0.052 (0.336)
+Train: 15 [ 550/625 ( 88%)]  Loss:  5.723816 (5.4322)  Time: 0.741s, 2765.39/s  (1.176s, 1740.82/s)  LR: 1.491e-03  Data: 0.050 (0.345)
+Train: 15 [ 600/625 ( 96%)]  Loss:  5.479098 (5.4358)  Time: 1.582s, 1294.54/s  (1.182s, 1732.10/s)  LR: 1.491e-03  Data: 0.053 (0.349)
+Train: 15 [ 624/625 (100%)]  Loss:  5.735288 (5.4572)  Time: 0.711s, 2879.62/s  (1.187s, 1725.47/s)  LR: 1.491e-03  Data: 0.000 (0.355)
+Test: [   0/24]  Time: 38.066 (38.066)  Loss:  2.5586 (2.5586)  Acc@1: 46.8750 (46.8750)  Acc@5: 73.0957 (73.0957)
+Test: [  24/24]  Time: 0.088 (2.060)  Loss:  2.0254 (3.2432)  Acc@1: 61.4387 (33.9860)  Acc@5: 77.5943 (59.4220)
+Test (EMA): [   0/24]  Time: 20.141 (20.141)  Loss:  6.4141 (6.4141)  Acc@1:  2.7344 ( 2.7344)  Acc@5: 10.3027 (10.3027)
+Test (EMA): [  24/24]  Time: 0.088 (1.304)  Loss:  6.1797 (6.5227)  Acc@1:  9.3160 ( 1.9140)  Acc@5: 20.5189 ( 6.6240)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-15.pth.tar', 1.9140000067138672)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-6.pth.tar', 0.1579999991607666)
+
+Train: 16 [   0/625 (  0%)]  Loss:  5.679553 (5.6796)  Time: 0.743s, 2757.61/s  (0.743s, 2757.61/s)  LR: 1.490e-03  Data: 0.080 (0.080)
+Train: 16 [  50/625 (  8%)]  Loss:  5.697249 (5.6884)  Time: 0.748s, 2737.23/s  (0.737s, 2780.20/s)  LR: 1.490e-03  Data: 0.051 (0.051)
+Train: 16 [ 100/625 ( 16%)]  Loss:  5.176694 (5.5178)  Time: 1.778s, 1151.61/s  (0.970s, 2110.95/s)  LR: 1.490e-03  Data: 0.058 (0.128)
+Train: 16 [ 150/625 ( 24%)]  Loss:  5.647689 (5.5503)  Time: 0.767s, 2670.23/s  (1.056s, 1940.21/s)  LR: 1.490e-03  Data: 0.047 (0.172)
+Train: 16 [ 200/625 ( 32%)]  Loss:  5.005291 (5.4413)  Time: 0.734s, 2791.70/s  (1.099s, 1863.12/s)  LR: 1.490e-03  Data: 0.057 (0.168)
+Train: 16 [ 250/625 ( 40%)]  Loss:  5.023434 (5.3717)  Time: 0.725s, 2825.07/s  (1.131s, 1810.60/s)  LR: 1.490e-03  Data: 0.046 (0.163)
+Train: 16 [ 300/625 ( 48%)]  Loss:  5.885383 (5.4450)  Time: 2.398s,  853.89/s  (1.148s, 1783.97/s)  LR: 1.490e-03  Data: 0.526 (0.156)
+Train: 16 [ 350/625 ( 56%)]  Loss:  5.350250 (5.4332)  Time: 0.745s, 2748.11/s  (1.157s, 1769.34/s)  LR: 1.490e-03  Data: 0.044 (0.159)
+Train: 16 [ 400/625 ( 64%)]  Loss:  5.014977 (5.3867)  Time: 0.748s, 2736.88/s  (1.164s, 1759.43/s)  LR: 1.490e-03  Data: 0.046 (0.167)
+Train: 16 [ 450/625 ( 72%)]  Loss:  5.272944 (5.3753)  Time: 0.734s, 2791.29/s  (1.169s, 1751.99/s)  LR: 1.490e-03  Data: 0.048 (0.177)
+Train: 16 [ 500/625 ( 80%)]  Loss:  5.588909 (5.3948)  Time: 0.730s, 2804.26/s  (1.177s, 1740.23/s)  LR: 1.490e-03  Data: 0.049 (0.177)
+Train: 16 [ 550/625 ( 88%)]  Loss:  5.811654 (5.4295)  Time: 0.722s, 2836.33/s  (1.183s, 1730.66/s)  LR: 1.490e-03  Data: 0.045 (0.179)
+Train: 16 [ 600/625 ( 96%)]  Loss:  5.210627 (5.4127)  Time: 0.757s, 2705.39/s  (1.185s, 1728.78/s)  LR: 1.490e-03  Data: 0.044 (0.175)
+Train: 16 [ 624/625 (100%)]  Loss:  5.006464 (5.3837)  Time: 0.681s, 3006.99/s  (1.192s, 1717.72/s)  LR: 1.490e-03  Data: 0.000 (0.182)
+Test: [   0/24]  Time: 35.279 (35.279)  Loss:  2.5645 (2.5645)  Acc@1: 47.5586 (47.5586)  Acc@5: 71.8262 (71.8262)
+Test: [  24/24]  Time: 0.088 (1.990)  Loss:  1.9688 (3.1672)  Acc@1: 60.1415 (35.0820)  Acc@5: 78.8915 (60.8100)
+Test (EMA): [   0/24]  Time: 20.049 (20.049)  Loss:  6.2773 (6.2773)  Acc@1:  4.2480 ( 4.2480)  Acc@5: 14.6973 (14.6973)
+Test (EMA): [  24/24]  Time: 0.088 (1.271)  Loss:  6.0195 (6.4223)  Acc@1: 11.2028 ( 2.5960)  Acc@5: 25.2358 ( 8.6560)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-16.pth.tar', 2.5960000021362304)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-15.pth.tar', 1.9140000067138672)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-7.pth.tar', 0.1939999991607666)
+
+Train: 17 [   0/625 (  0%)]  Loss:  5.312269 (5.3123)  Time: 2.357s,  869.01/s  (2.357s,  869.01/s)  LR: 1.488e-03  Data: 0.083 (0.083)
+Train: 17 [  50/625 (  8%)]  Loss:  5.483497 (5.3979)  Time: 0.738s, 2774.07/s  (0.774s, 2644.36/s)  LR: 1.488e-03  Data: 0.048 (0.051)
+Train: 17 [ 100/625 ( 16%)]  Loss:  5.323516 (5.3731)  Time: 0.940s, 2179.39/s  (0.941s, 2175.50/s)  LR: 1.488e-03  Data: 0.052 (0.176)
+Train: 17 [ 150/625 ( 24%)]  Loss:  4.907250 (5.2566)  Time: 0.785s, 2609.87/s  (1.025s, 1997.79/s)  LR: 1.488e-03  Data: 0.093 (0.207)
+Train: 17 [ 200/625 ( 32%)]  Loss:  5.681793 (5.3417)  Time: 2.974s,  688.54/s  (1.075s, 1905.89/s)  LR: 1.488e-03  Data: 2.298 (0.241)
+Train: 17 [ 250/625 ( 40%)]  Loss:  5.237239 (5.3243)  Time: 1.290s, 1587.57/s  (1.098s, 1865.50/s)  LR: 1.488e-03  Data: 0.557 (0.269)
+Train: 17 [ 300/625 ( 48%)]  Loss:  5.239777 (5.3122)  Time: 0.745s, 2750.28/s  (1.117s, 1833.73/s)  LR: 1.488e-03  Data: 0.042 (0.299)
+Train: 17 [ 350/625 ( 56%)]  Loss:  5.396608 (5.3227)  Time: 0.735s, 2787.32/s  (1.129s, 1813.78/s)  LR: 1.488e-03  Data: 0.048 (0.322)
+Train: 17 [ 400/625 ( 64%)]  Loss:  5.454742 (5.3374)  Time: 0.745s, 2748.26/s  (1.138s, 1799.89/s)  LR: 1.488e-03  Data: 0.043 (0.328)
+Train: 17 [ 450/625 ( 72%)]  Loss:  4.976585 (5.3013)  Time: 1.250s, 1638.26/s  (1.147s, 1786.27/s)  LR: 1.488e-03  Data: 0.575 (0.321)
+Train: 17 [ 500/625 ( 80%)]  Loss:  5.212280 (5.2932)  Time: 0.733s, 2792.81/s  (1.150s, 1780.55/s)  LR: 1.488e-03  Data: 0.047 (0.320)
+Train: 17 [ 550/625 ( 88%)]  Loss:  5.449225 (5.3062)  Time: 2.003s, 1022.30/s  (1.155s, 1773.46/s)  LR: 1.488e-03  Data: 1.329 (0.319)
+Train: 17 [ 600/625 ( 96%)]  Loss:  5.210544 (5.2989)  Time: 2.630s,  778.74/s  (1.159s, 1767.18/s)  LR: 1.488e-03  Data: 1.956 (0.323)
+Train: 17 [ 624/625 (100%)]  Loss:  5.186134 (5.2908)  Time: 0.675s, 3036.13/s  (1.160s, 1765.54/s)  LR: 1.488e-03  Data: 0.000 (0.321)
+Test: [   0/24]  Time: 36.992 (36.992)  Loss:  2.5234 (2.5234)  Acc@1: 47.3145 (47.3145)  Acc@5: 73.7793 (73.7793)
+Test: [  24/24]  Time: 0.088 (2.145)  Loss:  1.9355 (3.1295)  Acc@1: 62.0283 (36.0640)  Acc@5: 80.8962 (61.7920)
+Test (EMA): [   0/24]  Time: 20.325 (20.325)  Loss:  6.1250 (6.1250)  Acc@1:  5.5176 ( 5.5176)  Acc@5: 17.2852 (17.2852)
+Test (EMA): [  24/24]  Time: 0.088 (1.289)  Loss:  5.8398 (6.3157)  Acc@1: 13.5613 ( 3.4880)  Acc@5: 30.5425 (10.8380)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-17.pth.tar', 3.488000008544922)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-16.pth.tar', 2.5960000021362304)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-15.pth.tar', 1.9140000067138672)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-8.pth.tar', 0.23600000076293945)
+
+Train: 18 [   0/625 (  0%)]  Loss:  5.577501 (5.5775)  Time: 0.749s, 2733.58/s  (0.749s, 2733.58/s)  LR: 1.487e-03  Data: 0.087 (0.087)
+Train: 18 [  50/625 (  8%)]  Loss:  5.316709 (5.4471)  Time: 0.727s, 2816.16/s  (0.738s, 2774.64/s)  LR: 1.487e-03  Data: 0.048 (0.050)
+Train: 18 [ 100/625 ( 16%)]  Loss:  5.818570 (5.5709)  Time: 2.157s,  949.26/s  (0.957s, 2140.84/s)  LR: 1.487e-03  Data: 0.047 (0.087)
+Train: 18 [ 150/625 ( 24%)]  Loss:  5.472868 (5.5464)  Time: 0.765s, 2675.83/s  (1.046s, 1958.03/s)  LR: 1.487e-03  Data: 0.046 (0.110)
+Train: 18 [ 200/625 ( 32%)]  Loss:  4.507315 (5.3386)  Time: 0.727s, 2816.43/s  (1.096s, 1869.23/s)  LR: 1.487e-03  Data: 0.051 (0.131)
+Train: 18 [ 250/625 ( 40%)]  Loss:  5.281170 (5.3290)  Time: 0.745s, 2747.67/s  (1.124s, 1822.07/s)  LR: 1.487e-03  Data: 0.048 (0.128)
+Train: 18 [ 300/625 ( 48%)]  Loss:  5.331611 (5.3294)  Time: 0.938s, 2184.44/s  (1.137s, 1800.91/s)  LR: 1.487e-03  Data: 0.048 (0.139)
+Train: 18 [ 350/625 ( 56%)]  Loss:  5.196627 (5.3128)  Time: 0.730s, 2805.99/s  (1.150s, 1780.17/s)  LR: 1.487e-03  Data: 0.047 (0.150)
+Train: 18 [ 400/625 ( 64%)]  Loss:  5.178329 (5.2979)  Time: 0.736s, 2783.56/s  (1.154s, 1774.04/s)  LR: 1.487e-03  Data: 0.045 (0.148)
+Train: 18 [ 450/625 ( 72%)]  Loss:  4.776151 (5.2457)  Time: 0.732s, 2796.47/s  (1.161s, 1763.61/s)  LR: 1.487e-03  Data: 0.048 (0.141)
+Train: 18 [ 500/625 ( 80%)]  Loss:  5.375885 (5.2575)  Time: 2.413s,  848.60/s  (1.169s, 1752.38/s)  LR: 1.487e-03  Data: 0.042 (0.136)
+Train: 18 [ 550/625 ( 88%)]  Loss:  5.150142 (5.2486)  Time: 0.754s, 2717.70/s  (1.173s, 1745.72/s)  LR: 1.487e-03  Data: 0.046 (0.133)
+Train: 18 [ 600/625 ( 96%)]  Loss:  4.792544 (5.2135)  Time: 0.755s, 2714.23/s  (1.181s, 1733.85/s)  LR: 1.487e-03  Data: 0.062 (0.134)
+Train: 18 [ 624/625 (100%)]  Loss:  5.378068 (5.2252)  Time: 0.709s, 2887.46/s  (1.182s, 1731.98/s)  LR: 1.487e-03  Data: 0.000 (0.135)
+Test: [   0/24]  Time: 35.152 (35.152)  Loss:  2.4648 (2.4648)  Acc@1: 48.8281 (48.8281)  Acc@5: 74.0723 (74.0723)
+Test: [  24/24]  Time: 0.088 (2.063)  Loss:  1.8604 (3.1249)  Acc@1: 64.2689 (36.3820)  Acc@5: 81.6038 (62.0900)
+Test (EMA): [   0/24]  Time: 20.020 (20.020)  Loss:  5.9844 (5.9844)  Acc@1:  6.7871 ( 6.7871)  Acc@5: 20.1172 (20.1172)
+Test (EMA): [  24/24]  Time: 0.088 (1.276)  Loss:  5.6523 (6.2071)  Acc@1: 16.7453 ( 4.3960)  Acc@5: 37.9717 (13.3140)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-18.pth.tar', 4.396000001831054)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-17.pth.tar', 3.488000008544922)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-16.pth.tar', 2.5960000021362304)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-15.pth.tar', 1.9140000067138672)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-9.pth.tar', 0.29599999832153323)
+
+Train: 19 [   0/625 (  0%)]  Loss:  5.338970 (5.3390)  Time: 1.209s, 1693.84/s  (1.209s, 1693.84/s)  LR: 1.485e-03  Data: 0.335 (0.335)
+Train: 19 [  50/625 (  8%)]  Loss:  5.345845 (5.3424)  Time: 0.753s, 2719.03/s  (0.752s, 2723.90/s)  LR: 1.485e-03  Data: 0.049 (0.056)
+Train: 19 [ 100/625 ( 16%)]  Loss:  5.336161 (5.3403)  Time: 2.014s, 1016.72/s  (0.948s, 2161.12/s)  LR: 1.485e-03  Data: 0.047 (0.106)
+Train: 19 [ 150/625 ( 24%)]  Loss:  5.237485 (5.3146)  Time: 2.901s,  706.07/s  (1.037s, 1975.17/s)  LR: 1.485e-03  Data: 2.223 (0.194)
+Train: 19 [ 200/625 ( 32%)]  Loss:  5.599683 (5.3716)  Time: 1.625s, 1260.00/s  (1.070s, 1913.89/s)  LR: 1.485e-03  Data: 0.934 (0.225)
+Train: 19 [ 250/625 ( 40%)]  Loss:  5.496243 (5.3924)  Time: 0.724s, 2830.20/s  (1.096s, 1868.70/s)  LR: 1.485e-03  Data: 0.047 (0.230)
+Train: 19 [ 300/625 ( 48%)]  Loss:  5.481822 (5.4052)  Time: 2.190s,  935.36/s  (1.117s, 1832.84/s)  LR: 1.485e-03  Data: 0.929 (0.244)
+Train: 19 [ 350/625 ( 56%)]  Loss:  5.500998 (5.4172)  Time: 0.750s, 2730.54/s  (1.124s, 1821.57/s)  LR: 1.485e-03  Data: 0.053 (0.255)
+Train: 19 [ 400/625 ( 64%)]  Loss:  5.233177 (5.3967)  Time: 0.726s, 2819.47/s  (1.130s, 1812.23/s)  LR: 1.485e-03  Data: 0.048 (0.258)
+Train: 19 [ 450/625 ( 72%)]  Loss:  5.428082 (5.3998)  Time: 0.753s, 2720.33/s  (1.137s, 1801.44/s)  LR: 1.485e-03  Data: 0.057 (0.258)
+Train: 19 [ 500/625 ( 80%)]  Loss:  5.352530 (5.3955)  Time: 1.202s, 1703.95/s  (1.143s, 1792.12/s)  LR: 1.485e-03  Data: 0.047 (0.266)
+Train: 19 [ 550/625 ( 88%)]  Loss:  5.553718 (5.4087)  Time: 1.417s, 1445.27/s  (1.147s, 1785.25/s)  LR: 1.485e-03  Data: 0.047 (0.278)
+Train: 19 [ 600/625 ( 96%)]  Loss:  5.253042 (5.3968)  Time: 0.755s, 2714.11/s  (1.157s, 1770.22/s)  LR: 1.485e-03  Data: 0.053 (0.286)
+Train: 19 [ 624/625 (100%)]  Loss:  5.548222 (5.4076)  Time: 0.678s, 3022.68/s  (1.157s, 1770.71/s)  LR: 1.485e-03  Data: 0.000 (0.286)
+Test: [   0/24]  Time: 35.379 (35.379)  Loss:  2.5312 (2.5312)  Acc@1: 48.3887 (48.3887)  Acc@5: 74.1211 (74.1211)
+Test: [  24/24]  Time: 0.088 (2.164)  Loss:  1.9248 (3.1593)  Acc@1: 62.7358 (36.6320)  Acc@5: 80.5424 (62.0900)
+Test (EMA): [   0/24]  Time: 20.606 (20.606)  Loss:  5.8516 (5.8516)  Acc@1:  8.4473 ( 8.4473)  Acc@5: 23.0957 (23.0957)
+Test (EMA): [  24/24]  Time: 0.088 (1.361)  Loss:  5.4688 (6.0999)  Acc@1: 20.6368 ( 5.4220)  Acc@5: 42.2170 (15.5140)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-19.pth.tar', 5.42200001159668)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-18.pth.tar', 4.396000001831054)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-17.pth.tar', 3.488000008544922)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-16.pth.tar', 2.5960000021362304)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-15.pth.tar', 1.9140000067138672)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-10.pth.tar', 0.3639999997711182)
+
+Train: 20 [   0/625 (  0%)]  Loss:  4.916115 (4.9161)  Time: 1.317s, 1554.87/s  (1.317s, 1554.87/s)  LR: 1.484e-03  Data: 0.091 (0.091)
+Train: 20 [  50/625 (  8%)]  Loss:  4.640337 (4.7782)  Time: 0.736s, 2782.16/s  (0.747s, 2740.18/s)  LR: 1.484e-03  Data: 0.057 (0.051)
+Train: 20 [ 100/625 ( 16%)]  Loss:  4.987262 (4.8479)  Time: 0.728s, 2813.42/s  (0.954s, 2146.17/s)  LR: 1.484e-03  Data: 0.049 (0.152)
+Train: 20 [ 150/625 ( 24%)]  Loss:  5.625640 (5.0423)  Time: 0.728s, 2813.66/s  (1.043s, 1963.99/s)  LR: 1.484e-03  Data: 0.047 (0.158)
+Train: 20 [ 200/625 ( 32%)]  Loss:  5.171939 (5.0683)  Time: 0.747s, 2742.41/s  (1.097s, 1867.06/s)  LR: 1.484e-03  Data: 0.045 (0.174)
+Train: 20 [ 250/625 ( 40%)]  Loss:  5.318159 (5.1099)  Time: 0.728s, 2813.62/s  (1.126s, 1818.55/s)  LR: 1.484e-03  Data: 0.048 (0.194)
+Train: 20 [ 300/625 ( 48%)]  Loss:  5.335572 (5.1421)  Time: 1.616s, 1267.19/s  (1.143s, 1791.41/s)  LR: 1.484e-03  Data: 0.050 (0.195)
+Train: 20 [ 350/625 ( 56%)]  Loss:  5.345973 (5.1676)  Time: 0.729s, 2809.63/s  (1.155s, 1772.46/s)  LR: 1.484e-03  Data: 0.047 (0.192)
+Train: 20 [ 400/625 ( 64%)]  Loss:  5.085783 (5.1585)  Time: 0.728s, 2813.86/s  (1.168s, 1753.42/s)  LR: 1.484e-03  Data: 0.045 (0.187)
+Train: 20 [ 450/625 ( 72%)]  Loss:  5.657721 (5.2085)  Time: 0.764s, 2681.24/s  (1.171s, 1748.86/s)  LR: 1.484e-03  Data: 0.047 (0.175)
+Train: 20 [ 500/625 ( 80%)]  Loss:  4.760744 (5.1677)  Time: 0.735s, 2786.06/s  (1.174s, 1745.05/s)  LR: 1.484e-03  Data: 0.053 (0.168)
+Train: 20 [ 550/625 ( 88%)]  Loss:  5.451868 (5.1914)  Time: 0.746s, 2746.15/s  (1.182s, 1732.36/s)  LR: 1.484e-03  Data: 0.047 (0.165)
+Train: 20 [ 600/625 ( 96%)]  Loss:  5.125345 (5.1863)  Time: 0.772s, 2652.89/s  (1.185s, 1728.28/s)  LR: 1.484e-03  Data: 0.049 (0.160)
+Train: 20 [ 624/625 (100%)]  Loss:  4.549986 (5.1409)  Time: 0.691s, 2963.63/s  (1.191s, 1718.85/s)  LR: 1.484e-03  Data: 0.000 (0.158)
+Test: [   0/24]  Time: 34.431 (34.431)  Loss:  2.2207 (2.2207)  Acc@1: 52.7832 (52.7832)  Acc@5: 77.1973 (77.1973)
+Test: [  24/24]  Time: 0.088 (2.010)  Loss:  1.7754 (2.9944)  Acc@1: 64.6226 (37.8440)  Acc@5: 81.3679 (63.5720)
+Test (EMA): [   0/24]  Time: 20.623 (20.623)  Loss:  5.7344 (5.7344)  Acc@1:  9.5215 ( 9.5215)  Acc@5: 25.2930 (25.2930)
+Test (EMA): [  24/24]  Time: 0.088 (1.297)  Loss:  5.3008 (5.9966)  Acc@1: 23.9387 ( 6.4260)  Acc@5: 45.5189 (17.7020)
+Current checkpoints:
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-20.pth.tar', 6.426000023803711)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-19.pth.tar', 5.42200001159668)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-18.pth.tar', 4.396000001831054)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-17.pth.tar', 3.488000008544922)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-16.pth.tar', 2.5960000021362304)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-15.pth.tar', 1.9140000067138672)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-14.pth.tar', 1.3959999978637696)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-13.pth.tar', 0.9979999998474121)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-12.pth.tar', 0.7319999993896484)
+ ('./output/train/20220405-095751-vit_tiny_patch16_224-224/checkpoint-11.pth.tar', 0.506000000076294)
+
+Train: 21 [   0/625 (  0%)]  Loss:  5.437661 (5.4377)  Time: 0.742s, 2759.81/s  (0.742s, 2759.81/s)  LR: 1.482e-03  Data: 0.079 (0.079)
+Train: 21 [  50/625 (  8%)]  Loss:  5.755215 (5.5964)  Time: 0.741s, 2763.67/s  (0.747s, 2741.29/s)  LR: 1.482e-03  Data: 0.060 (0.050)
+Train: 21 [ 100/625 ( 16%)]  Loss:  5.144795 (5.4459)  Time: 1.047s, 1956.21/s  (0.945s, 2168.26/s)  LR: 1.482e-03  Data: 0.073 (0.125)
+Train: 21 [ 150/625 ( 24%)]  Loss:  5.316598 (5.4136)  Time: 1.041s, 1967.59/s  (1.037s, 1974.17/s)  LR: 1.482e-03  Data: 0.157 (0.186)
+Train: 21 [ 200/625 ( 32%)]  Loss:  5.599257 (5.4507)  Time: 0.817s, 2505.69/s  (1.088s, 1882.75/s)  LR: 1.482e-03  Data: 0.054 (0.243)

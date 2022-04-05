@@ -388,7 +388,7 @@ class MlpMixer(nn.Module):
             num_blocks=8,
             embed_dim=512,
             mlp_ratio=(0.5, 4.0), #(0.5, 4.0),
-            block_layer=MixerBlockConv, #MixerBlockConv, #MixerBlock,
+            block_layer=MixerBlock, #MixerBlockConv, #MixerBlock,
             mlp_layer=Mlp,
             norm_layer=partial(nn.LayerNorm, eps=1e-6),
             act_layer=nn.GELU,
